@@ -1,6 +1,5 @@
 # models.py
 import datetime
-# Thay đổi import:
 from custom_structures import CustomLinkedList 
 from typing import Any, Optional, Dict, List 
 
@@ -10,13 +9,13 @@ HISTORY_ITEM_SEPARATOR = "|"
 HISTORY_FIELD_SEPARATOR = ";"
 
 class BenhNhan:
-    def __init__(self, ma_bn: str, ho_ten: str, ngay_sinh: Any, gioi_tinh: str, dia_chi: str, sdt: str, cccd: str, # cccd giờ là bắt buộc
+    def __init__(self, ma_bn: str, ho_ten: str, ngay_sinh: Any, gioi_tinh: str, dia_chi: str, sdt: str, cccd: str, 
                  bhyt: str = "", tien_su_benh_an: str = "", di_ung_thuoc: str = "",
                  thoi_diem_dang_ky_str: Optional[str] = None, lich_su_kham_benh_str: Optional[str] = None):
         self.ma_bn = ma_bn
         self.ho_ten = ho_ten
         
-        if isinstance(ngay_sinh, str):
+        if isinstance(ngay_sinh, str) and ngay_sinh.strip():
             try:
                 self.ngay_sinh = datetime.datetime.strptime(ngay_sinh, DATE_FORMAT_CSV).date()
             except ValueError:
@@ -29,7 +28,7 @@ class BenhNhan:
         self.gioi_tinh = gioi_tinh
         self.dia_chi = dia_chi
         self.sdt = sdt
-        self.cccd = cccd # Gán trực tiếp
+        self.cccd = cccd 
         self.bhyt = bhyt
         self.tien_su_benh_an = tien_su_benh_an
         self.di_ung_thuoc = di_ung_thuoc
@@ -53,7 +52,7 @@ class BenhNhan:
             ngay_kham_str = ""
             if isinstance(ngay_kham_val, datetime.date):
                  ngay_kham_str = ngay_kham_val.strftime(DATE_FORMAT_CSV)
-            elif isinstance(ngay_kham_val, str) : # Nếu đã là chuỗi (có thể từ load lỗi)
+            elif isinstance(ngay_kham_val, str) : 
                 ngay_kham_str = ngay_kham_val
 
             ket_qua = str(item_dict.get('ket_qua', "")).replace(HISTORY_FIELD_SEPARATOR, " ").replace(HISTORY_ITEM_SEPARATOR, " ")
@@ -69,51 +68,36 @@ class BenhNhan:
             fields = item_str.split(HISTORY_FIELD_SEPARATOR)
             if len(fields) == 3:
                 ngay_kham_obj = None
-                if fields[0]: # Chỉ parse nếu có chuỗi ngày
+                if fields[0]: 
                     try:
                         ngay_kham_obj = datetime.datetime.strptime(fields[0], DATE_FORMAT_CSV).date()
                     except ValueError:
                         pass 
-                # Vẫn thêm lịch sử dù ngày không parse được, nhưng ngày sẽ là None hoặc chuỗi gốc
                 self.lich_su_kham_benh.append({
-                    "ngay_kham": ngay_kham_obj if ngay_kham_obj else fields[0], # Lưu lại chuỗi nếu không parse được
+                    "ngay_kham": ngay_kham_obj if ngay_kham_obj else fields[0], 
                     "ket_qua": fields[1],
                     "ghi_chu": fields[2]
                 })
-
 
     def to_csv_row(self) -> Dict[str, Any]:
         ngay_sinh_str = self.ngay_sinh.strftime(DATE_FORMAT_CSV) if self.ngay_sinh else ""
         thoi_diem_str = self.thoi_diem_dang_ky_he_thong.strftime(DATETIME_FORMAT_DISPLAY)
         
         return {
-            "ma_bn": self.ma_bn,
-            "ho_ten": self.ho_ten,
-            "ngay_sinh": ngay_sinh_str,
-            "gioi_tinh": self.gioi_tinh,
-            "dia_chi": self.dia_chi,
-            "sdt": self.sdt,
-            "cccd": self.cccd, # Sẽ luôn có giá trị
-            "bhyt": self.bhyt,
-            "tien_su_benh_an": self.tien_su_benh_an,
-            "di_ung_thuoc": self.di_ung_thuoc,
-            "thoi_diem_dang_ky_he_thong": thoi_diem_str,
+            "ma_bn": self.ma_bn, "ho_ten": self.ho_ten, "ngay_sinh": ngay_sinh_str,
+            "gioi_tinh": self.gioi_tinh, "dia_chi": self.dia_chi, "sdt": self.sdt,
+            "cccd": self.cccd, "bhyt": self.bhyt, "tien_su_benh_an": self.tien_su_benh_an,
+            "di_ung_thuoc": self.di_ung_thuoc, "thoi_diem_dang_ky_he_thong": thoi_diem_str,
             "lich_su_kham_benh": self._serialize_lich_su_kham()
         }
 
     @classmethod
     def from_csv_row(cls, row: Dict[str, str]) -> 'BenhNhan':
         return cls(
-            ma_bn=row["ma_bn"],
-            ho_ten=row["ho_ten"],
-            ngay_sinh=row["ngay_sinh"], 
-            gioi_tinh=row["gioi_tinh"],
-            dia_chi=row["dia_chi"],
-            sdt=row["sdt"],
-            cccd=row.get("cccd", "N/A"), # Lấy cccd, nếu thiếu từ file CSV cũ thì đặt N/A
-            bhyt=row.get("bhyt", ""),
-            tien_su_benh_an=row.get("tien_su_benh_an", ""),
-            di_ung_thuoc=row.get("di_ung_thuoc", ""),
+            ma_bn=row.get("ma_bn", ""), ho_ten=row.get("ho_ten", ""), ngay_sinh=row.get("ngay_sinh", ""), 
+            gioi_tinh=row.get("gioi_tinh", ""), dia_chi=row.get("dia_chi", ""), sdt=row.get("sdt", ""),
+            cccd=row.get("cccd", "N/A_DEFAULT"), bhyt=row.get("bhyt", ""), 
+            tien_su_benh_an=row.get("tien_su_benh_an", ""), di_ung_thuoc=row.get("di_ung_thuoc", ""),
             thoi_diem_dang_ky_str=row.get("thoi_diem_dang_ky_he_thong"),
             lich_su_kham_benh_str=row.get("lich_su_kham_benh")
         )
@@ -123,9 +107,7 @@ class BenhNhan:
 
     def them_lich_su_kham(self, ngay_kham: datetime.date, ket_qua_kham: str, ghi_chu: str = ""):
         self.lich_su_kham_benh.append({
-            "ngay_kham": ngay_kham,
-            "ket_qua": ket_qua_kham,
-            "ghi_chu": ghi_chu
+            "ngay_kham": ngay_kham, "ket_qua": ket_qua_kham, "ghi_chu": ghi_chu
         })
 
     def hien_thi_thong_tin_chi_tiet(self):
@@ -135,7 +117,7 @@ class BenhNhan:
             if isinstance(ngay_kham_display, datetime.date):
                 ngay_kham_display = ngay_kham_display.strftime(DATE_FORMAT_CSV)
             else: 
-                ngay_kham_display = str(ngay_kham_display) # Hiển thị chuỗi nếu không phải date obj
+                ngay_kham_display = str(ngay_kham_display) 
 
             ls_kham_items.append(f"{ngay_kham_display}: {lk_dict.get('ket_qua','')} (Ghi chú: {lk_dict.get('ghi_chu','')})")
         ls_kham_str = "\n  ".join(ls_kham_items)
@@ -144,15 +126,10 @@ class BenhNhan:
         thoi_diem_display = self.thoi_diem_dang_ky_he_thong.strftime(DATETIME_FORMAT_DISPLAY)
 
         return (
-            f"Mã BN: {self.ma_bn}\n"
-            f"Họ tên: {self.ho_ten}\n"
-            f"Ngày sinh: {ngay_sinh_display}\n"
-            f"Giới tính: {self.gioi_tinh}\n"
-            f"Địa chỉ: {self.dia_chi}\n"
-            f"SĐT: {self.sdt}\n"
-            f"CCCD: {self.cccd}\n" # CCCD sẽ được hiển thị
-            f"BHYT: {self.bhyt}\n"
-            f"Tiền sử bệnh án: {self.tien_su_benh_an}\n"
+            f"Mã BN: {self.ma_bn}\n" f"Họ tên: {self.ho_ten}\n"
+            f"Ngày sinh: {ngay_sinh_display}\n" f"Giới tính: {self.gioi_tinh}\n"
+            f"Địa chỉ: {self.dia_chi}\n" f"SĐT: {self.sdt}\n" f"CCCD: {self.cccd}\n"
+            f"BHYT: {self.bhyt}\n" f"Tiền sử bệnh án: {self.tien_su_benh_an}\n"
             f"Dị ứng thuốc: {self.di_ung_thuoc}\n"
             f"Thời điểm đăng ký hệ thống: {thoi_diem_display}\n"
             f"Lịch sử khám bệnh:\n  {ls_kham_str if ls_kham_str else 'Chưa có'}"
