@@ -16,7 +16,7 @@ Phiên bản: 1.2 (Cập nhật ngày 31/05/2025 - Thêm Quản lý Bác sĩ, Ph
      - custom_structures.py
    - Mở terminal (hoặc Command Prompt).
    - Di chuyển (cd) vào thư mục chứa các file mã nguồn trên.
-   - Chạy lệnh `python3 -m pip install -r requirements.txt` để cài đặt thư viện thực hiện môi trường.
+   - Chạy lệnh `python3 -m pip install -r requirements.txt` để cài đặt thư viện thực hiện.
    - Chạy file giao diện chính bằng lệnh: `python main_gui.py`
    - Các file dữ liệu CSV sau sẽ được tự động tạo/đọc trong cùng thư mục khi chương trình khởi chạy và thực hiện các thao tác lưu trữ:
      - `patients_data.csv` (Hồ sơ bệnh nhân)
