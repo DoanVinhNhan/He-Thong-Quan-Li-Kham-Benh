@@ -10,9 +10,9 @@ Phiên bản: 1.2 (Cập nhật ngày 31/05/2025 - Thêm Quản lý Bác sĩ, Ph
 
 2. Cách chạy chương trình:
    - Đảm bảo tất cả các file mã nguồn Python (.py) sau đây nằm trong cùng một thư mục:
-     - 'main_gui.py'
-     - 'app_logic.py'
-     - 'models.py'
+     - `main_gui.py`
+     - `app_logic.py`
+     - `models.py`
      - custom_structures.py
    - Mở terminal (hoặc Command Prompt).
    - Di chuyển (cd) vào thư mục chứa các file mã nguồn trên.
