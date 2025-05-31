@@ -1,0 +1,75 @@
+\newpage
+\subsubsection{MedicalSystemLogic}
+\red{Cấu trúc quản lý toàn bộ logic của hệ thống khám bệnh.}
+\begin{minted}[escapeinside=||]{python3}
+|\bf ADT| MedicalSystemLogic
+    |\bf HashTable| patient_records_table
+    |\bf Int| next_patient_id_counter
+    |\bf HashTable| clinic_examination_queues
+    |\bf LinkedList| examined_patients_today_list
+    |\bf HashTable| doctor_records_table
+    |\bf int| next_doctor_id_counter
+    |\bf HashTable| clinic_records_table
+    |\bf Int| next_clinic_id_counter
+\end{minted}
+Trong đó
+\begin{itemize}
+    \item patient\_records\_table: Lưu trữ tất cả hồ sơ bệnh nhân (Patient objects), với patient\_id làm khóa.
+    \item next\_patient\_id\_counter (int): Bộ đếm dùng để tạo patient\_id mới một cách tự động.
+    \item clinic\_examination\_queues: Lưu trữ các hàng đợi khám bệnh. Khóa là clinic\_id, giá trị là một đối tượng PriorityQueue cho phòng khám đó.
+    \item examined\_patients\_today\_list: Lưu trữ các đối tượng Patient đã được khám xong trong phiên làm việc hiện tại.
+    \item doctor\_records\_table: Lưu trữ thông tin bác sĩ (Doctor objects), với doctor\_id làm khóa.
+    \item next\_doctor\_id\_counter: Bộ đếm dùng để tạo doctor\_id mới.
+    \item clinic\_records\_table: Lưu trữ thông tin phòng khám (Clinic objects), với clinic\_id làm khóa.
+    \item next\_clinic\_id\_counter: Bộ đếm dùng để tạo clinic\_id mới.
+\end{itemize}
+Bao gồm các phương thức
+\begin{itemize}
+    \item Phương thức khởi tạo
+    \item Các phương thức Lưu trữ, truy cập file.
+    \item Các phương thức cập nhật bộ đếm ID
+    \item Các phương thức của module Quản lí hồ sơ bệnh nhân
+    \begin{itemize}
+        \item \textbf{create\_patient\_record()}
+        \item \textbf{update\_patient\_info()}
+        \item \textbf{delete\_patient\_record()}
+    \end{itemize}
+    \item Các phương thức của module Quản lý Hàng đợi và Quy trình Khám
+    \begin{itemize}
+        \item \textbf{register\_for\_examination()}
+        \item \textbf{call\_next\_patient\_for\_exam()}
+        \item \textbf{complete\_examination()}
+        \item \textbf{handle\_absent\_called\_patient}
+        \item \textbf{handle\_patient\_leaving\_queue()}
+        \item \textbf{get\_clinic\_queue\_display\_list()}
+        \item \textbf{update\_priority\_for\_long\_waiters()}
+        \item \textbf{change\_patient\_priority\_in\_queue()}
+    \end{itemize}
+    \item Các phương thức của module Quản lý Bác sĩ
+    \begin{itemize}
+        \item \textbf{create\_doctor()}
+        \item \textbf{update\_doctor\_info()}
+        \item \textbf{delete\_doctor()}
+    \end{itemize}
+    \item Các phương thức của module Quản lý Phòng khám
+    \begin{itemize}
+        \item \textbf{create\_clinic()}
+        \item \textbf{update\_clinic\_info()}
+        \item \textbf{delete\_clinic()}
+        \item \textbf{assign\_doctor\_to\_clinic()}
+        \item \textbf{remove\_doctor\_from\_clinic()}
+    \end{itemize}
+    \item Các phương thức của module Tìm kiếm và Liệt kê
+    \begin{itemize}
+        \item \textbf{list\_all\_patients()}
+        \item \textbf{advanced\_patient\_search()}
+        \item \textbf{list\_all\_doctors()}
+        \item \textbf{list\_all\_clinics()}
+        \item \textbf{collect\_all\_examination\_history()}
+        \item \textbf{filter\_examination\_history()}
+        \item \textbf{list\_patients\_examined\_today()}
+        \item \textbf{find\_patient\_by\_id()}
+        \item \textbf{find\_doctor\_by\_id()}
+        \item \textbf{find\_clinic\_by\_id()}
+    \end{itemize}
+\end{itemize}

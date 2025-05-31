@@ -1,0 +1,193 @@
+\subsubsection{List}
+\red{Cấu trúc danh sách động}
+\begin{minted}[escapeinside=||]{python3}
+|\bf ADT| List
+    |\bf Int| capacity
+    |\bf Int| size
+    |\bf array| elements
+\end{minted}
+Bao gồm các phương thức
+\begin{minted}[escapeinside=||]{python3}
+|\bf ADT| List
+    |\bf Void| init(initial_capacity=10) #Khởi tạo
+    |\bf Int| len()
+    |\bf Bool| isEmpty()
+    |\bf Void| resize()
+    |\bf Void| append(item)
+    |\bf Any| get(index)
+    |\bf Void| set(index, item)
+    |\bf Void| insert(index, item)
+    |\bf Any| pop(index)
+    |\bf Void| iter() #Cho phép vòng for duyệt danh sách
+    |\bf String| str() #Trả về một chuỗi biểu diễn danh sách
+\end{minted}
+
+\subsubsection{ListNode}
+\red{Cấu trúc Nút} Đại diện cho một nút trong danh sách liên kết.
+\begin{minted}[escapeinside=||]{python3}
+|\bf ADT| ListNode
+    |\bf Any| value
+    |\bf ListNode| next_node
+\end{minted}
+Bao gồm các phương thức
+\begin{minted}[escapeinside=||]{python3}
+|\bf ADT| List
+    |\bf Void| init(value) #Khởi tạo
+\end{minted}
+
+\subsubsection{LinkedList}
+\red{Cấu trúc Danh sách liên kết đơn}
+\begin{minted}[escapeinside=||]{python3}
+|\bf ADT| LinkedList
+    |\bf ListNode| head_node
+    |\bf ListNode| tail_node
+    |\bf Int| size
+\end{minted}
+Bao gồm các phương thức
+\begin{minted}[escapeinside=||]{python3}
+|\bf ADT| List
+    |\bf Void| init() #Khởi tạo
+    |\bf Void| append(value)
+    |\bf Int| len()
+    |\bf Bool| isEmpty()
+    |\bf Void| iter() #Cho phép vòng for duyệt danh sách.
+    |\bf Any| get(self, index)
+    |\bf Any| get_last(self, index)
+    |\bf Str| str() #Trả về một chuỗi biểu diễn danh sách liên kết 
+\end{minted}
+\subsubsection{HashNode}
+\red{Cấu trúc nút trong bảng Băm} Đại diện cho một nút trong bảng băm (sử dụng để xử lý xung đột bằng phương pháp nối chuỗi - chaining).
+\begin{minted}[escapeinside=||]{python3}
+|\bf ADT| HashNode
+    |\bf Int| key
+    |\bf Any| value
+    |\bf HashNode| next_node
+\end{minted}
+Bao gồm các phương thức
+\begin{minted}[escapeinside=||]{python3}
+|\bf ADT| List
+    |\bf Void| init(key,value) #Khởi tạo
+    |\bf Str| str() #Trả về một chuỗi biễu diễn (key:value).
+\end{minted}
+\subsubsection{HashTable}
+\red{Cấu trúc bảng băm}
+\begin{minted}[escapeinside=||]{python3}
+|\bf ADT| HashTable
+    |\bf Int| table_size
+    |\bf List| buckets_list
+    |\bf Int| item_count
+\end{minted}
+Bao gồm các phương thức
+\begin{itemize}
+    \item \textbf{Khởi tạo}
+\begin{minted}[escapeinside=||]{python3}
+|\bf Void| init( initial_table_size=100) #Khởi tạo
+\end{minted}
+\item \textbf{Hàm băm}
+\begin{minted}[escapeinside=||]{python3}
+    |\bf Int| hash_function(key)
+\end{minted}
+\begin{itemize}
+    \item Tính toán chỉ số (index) của bucket cho một key nhất định. 
+    \item Sử dụng hàm băm đơn giản cho chuỗi (tổng mã ASCII) hoặc số nguyên, sau đó lấy phần dư với table\_size
+\end{itemize}
+\item \textbf{put\_item()}
+\begin{minted}[escapeinside=||]{python3}
+    |\bf Void| put_item(self, key, value)
+\end{minted}
+\begin{itemize}
+    \item  Thêm một cặp (key, value) vào bảng băm. Nếu key đã tồn tại, cập nhật value
+    \item Nếu có xung đột (cùng chỉ số hash), thêm HashNode mới vào đầu danh sách liên kết tại bucket đó. Tăng item\_count
+\end{itemize}
+\item Lấy và xoá phần tử bằng khoá
+\begin{minted}[escapeinside=||]{python3}
+    |\bf Any| get_item(self, key)
+    |\bf Bool| delete_item(self, key)
+\end{minted}
+\item Các phương thức hiển thị, tính kích cỡ của bảng băm
+\begin{minted}[escapeinside=||]{python3}
+    |\bf Bool| contains_key(self, key)
+    |\bf List| get_all_values_as_list(self)
+    |\bf Bool| isEmpty()
+    |\bf Int| len()
+\end{minted}
+\end{itemize}
+\subsubsection{MaxHeap}
+\red{Cấu trúc đống cực đại}
+\begin{minted}[escapeinside=||]{python3}
+|\bf ADT| HashTable
+    |\bf List| heap_list
+\end{minted}
+Bao gồm các phương thức
+\begin{itemize}
+    \item \textbf{Các phương thức cơ bản}
+\begin{minted}[escapeinside=||]{python3}
+    |\bf Bool| init() #Khởi tạo
+    |\bf Int| get_parent_index(i)
+    |\bf Int| get_left_child_index(i)
+    |\bf Int| get_right_child_index(i)
+    |\bf Void| swap_elements(i,j)
+\end{minted}
+    \item \textbf{sift\_up()}
+\begin{minted}[escapeinside=||]{python3}
+    |\bf Void| sift_up(i)
+\end{minted}
+\begin{itemize}
+    \item Di chuyển phần tử tại chỉ số i lên trên trong heap cho đến khi tính chất Max Heap được thỏa mãn (phần tử cha luôn lớn hơn hoặc bằng các con).
+    \item Thường dùng sau khi thêm phần tử mới.
+\end{itemize}
+    \item \textbf{sift\_down()}
+\begin{minted}[escapeinside=||]{python3}
+    |\bf Void| sift_down(i)
+\end{minted}
+\begin{itemize}
+    \item Di chuyển phần tử tại chỉ số i xuống dưới trong heap cho đến khi tính chất Max Heap được thỏa mãn. 
+    \item Thường dùng sau khi xóa phần tử gốc (lớn nhất) hoặc khi ưu tiên của một phần tử bị giảm.
+\end{itemize}
+\item Các phương thức khác
+\begin{minted}[escapeinside=||]{python3}
+    |\bf Void| add_item(item)
+    |\bf Any| get_max_item()
+    |\bf Any| remove_max_item()
+    |\bf Bool| isEmpty()
+    |\bf Void| get_all_heap_elements()
+    |\bf Void| change_item_priority(item_id_to_change, new_priority)
+\end{minted}
+\end{itemize}
+\subsubsection{PriorityQueue}
+\red{Cấu trúc hàng đợi ưu tiên sử dụng MaxHeap}
+\begin{minted}[escapeinside=||]{python3}
+|\bf ADT| MaxHeap
+    |\bf MaxHeap| internal_heap
+\end{minted}
+Bao gồm các phương thức
+\begin{itemize}
+    \item Các phương thức cơ bản
+\begin{minted}[escapeinside=||]{python3}
+    |\bf Void| init() #Khởi tạo
+    |\bf Int| current_size()
+    |\bf Any| get_first_item()
+    |\bf Void| remove_first_item()
+    |\bf Void| add_item()
+    |\bf Bool| is_empty()
+\end{minted}
+\item \textbf{update\_long\_waiter\_priority()}
+\begin{minted}[escapeinside=||]{python3}
+    |\bf Void| update_long_waiter_priority(self, patient_in_queue_class_ref)
+\end{minted}
+\begin{itemize}
+    \item Duyệt qua các bệnh nhân (PatientInQueue) trong heap. Nếu thời gian chờ của bệnh nhân (now - registration\_time) vượt quá 60 phút, tăng ưu tiên của họ lên (nếu chưa đạt mức tối đa). Sau đó, gọi \_sift\_up cho các bệnh nhân đã được cập nhật. Phương thức này được gọi tự động mỗi 15 phút một lần.
+\end{itemize}
+\item \textbf{get\_display\_queue\_as\_strings()}
+\begin{minted}[escapeinside=||]{python3}
+    |\bf List| get_display_queue_as_strings( patient_in_queue_class_ref)
+\end{minted}
+\begin{itemize}
+    \item Tạo một bản sao của heap hiện tại, sau đó liên tục lấy phần tử ưu tiên cao nhất ra và chuyển thành chuỗi thông tin để hiển thị. Kết quả là một List các chuỗi, được sắp xếp theo thứ tự ưu tiên giảm dần.
+\end{itemize}
+\item \textbf{change\_queued\_patient\_priority()}
+\begin{minted}[escapeinside=||]{python3}
+    |\bf List| change_queued_patient_priority( patient_id, new_priority)
+\end{minted}
+\item Gọi phương thức change\_item\_priority của internal\_heap để thay đổi ưu tiên của một bệnh nhân (patient\_id) đang có trong hàng đợi thành new\_priority.
+\end{itemize}

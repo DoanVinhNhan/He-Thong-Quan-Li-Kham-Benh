@@ -1,0 +1,250 @@
+\newpage
+\section{Thiết kế và triển khai chương trình}
+\subsection{Tổng quan kiến trúc hệ thống}
+Hệ thống được xây dựng dựa trên các thành phần chính sau:
+\begin{itemize}
+    \item \hi{Tầng Mô hình dữ liệu:} Định nghĩa các đối tượng như \red{PatientProfile (Hồ sơ bệnh nhân)}, \red{PatientInQueue (đại diện cho một bệnh nhân trong hàng đợi)}, \red{Doctor (Bác sĩ)}, \red{Clinic (Phòng khám)}. Đóng gói dữ liệu và phương thức cơ bản của từng đối tượng.
+    \item \hi{Tầng cấu trúc dữ liệu cơ bản:} Bao gồm các cấu trúc dữ liệu cốt lõi được triển khai cho hệ thống: \red{LinkedList (Danh sách liên kết)}, \red{HashTable (Bảng băm)}, \red{MaxHeap}, \red{PriorityQueue}. Các cấu trúc này được lựa chọn và thiết kế để tối ưu hóa các thao tác nghiệp vụ cụ thể của hệ thống.
+    \item \hi{Tầng Logic nghiệp vụ:} Xây dựng lớp \red{HospitalManagementSystem (Hệ thống quản lý khám bệnh)} đóng vai trò trung tâm, điều phối mọi hoạt động của hệ thống. Nó sử dụng các \hi{Mô hình dữ liệu và cấu trúc trúc dữ liệu cơ bản} để thực hiện các Module như \hi{quản lý hồ sơ bệnh nhân, quản lý hàng đợi khám, quản lý bác sĩ, quản lý phòng khám, tìm kiếm thông tin, Chịu trách nhiệm đọc file, lưu file.}
+\end{itemize}
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+\node[draw,rectangle, fill=orange!20] (a) at (0,0) {Tầng Logic nghiệp vụ};
+\node[draw,rectangle, fill=orange!70] (b) at (-4,-4) {Tầng Mô hình dữ liệu};
+\node[draw,rectangle, fill=orange!70] (c) at (4,-4) {Tầng Cấu trúc dữ liệu cơ bản};
+\draw[-latex, thick] (b)--(a.south);
+\draw[-latex, thick] (c)--(a.south);
+\draw[-latex, thick] (b)--(c);
+\end{tikzpicture}
+\caption{Mô hình kiến trúc hệ thống}
+\end{figure}
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[scale=0.5]
+\node[scale=1.2,draw,rectangle, fill=orange!20] (1) at (0,0) {Tầng Logic nghiệp vụ};
+\node[scale=0.8,draw,rectangle, fill=cyan!30,] (a) at (-15,-6) {\begin{minipage}{0.2\textwidth}\centering Module Quản lí \\hồ sơ \\bệnh nhân\end{minipage}};
+\node[scale=0.8,draw,rectangle, fill=cyan!30] (b) at (-9,-6) {\begin{minipage}{0.2\textwidth} \centering Module Quản lí \\hàng đợi chờ khám\end{minipage}};
+\node[scale=0.8,draw,rectangle, fill=cyan!30] (c) at (-3,-6) {\begin{minipage}{0.2\textwidth}\centering Module\\ Tìm kiếm và liệt kê\end{minipage}};
+\node[scale=0.8,draw,rectangle, fill=cyan!30] (d) at (3,-6) {\begin{minipage}{0.2\textwidth}\centering Module\\ Quản lí\\ Bác sĩ\end{minipage}};
+\node[scale=0.8,draw,rectangle, fill=cyan!30] (e) at (9,-6) {\begin{minipage}{0.2\textwidth}\centering Module\\ Quản lí phòng khám\end{minipage}};
+\node[scale=0.8,draw,rectangle, fill=cyan!30] (f) at (15,-6) {\begin{minipage}{0.2\textwidth}\centering Module \\Truy xuất và lưu trữ file\end{minipage}};
+\draw[-latex, thick] (1.south)--++(0,-2)--++(-15,0)--(a);
+\draw[-latex, thick] (1.south)--++(0,-2)--++(-9,0)--(b);
+\draw[-latex, thick] (1.south)--++(0,-2)--++(-3,0)--(c);
+\draw[-latex, thick] (1.south)--++(0,-2)--++(3,0)--(d);
+\draw[-latex, thick] (1.south)--++(0,-2)--++(9,0)--(e);
+\draw[-latex, thick] (1.south)--++(0,-2)--++(15,0)--(f);
+\end{tikzpicture}
+\newpage
+\caption{Mô hình kiến trúc Module}
+\end{figure}
+\newpage
+\subsection{Thiết kế chi tiết các cấu trúc}
+\subsubsection{Cấu trúc Patient}
+\red{Cấu trúc Hồ sơ bệnh nhân:} Lưu trữ toàn bộ thông tin về bệnh nhân. Đại diện cho một hồ sơ của bệnh nhân trong hệ thống.
+\begin{minted}[escapeinside=||]{python3}
+|\bf ADT| Patient
+    |\bf Str| patient_id  #Mã bệnh nhân (VD: BN0003)
+    |\bf Str| full_name 
+    |\bf Datetime| date_of_birth 
+    |\bf Str| gender 
+    |\bf Str| address 
+    |\bf Int| phone_number 
+    |\bf Int| national_id  #Mã CCCD
+    |\bf Int| health_insurance_id  #Mã BHYT
+    |\bf Str| drug_allergies 
+    |\bf datetime| system_registration_time = NULL
+    |\bf LinkedList| examination_history #Lịch sử khám (LinkedList sẽ được định nghĩa sau)
+\end{minted}
+Bao gồm các phương thức:
+\begin{itemize}
+    \item \textbf{Khởi tạo}
+\begin{minted}[escapeinside=||]{python3}
+|\bf Void| init(patient_id, full_name, date_of_birth_val, gender, address="", phone_number, national_id, health_insurance_id="", medical_history_summary="", drug_allergies="", system_registration_time, examination_history=|\nullt|)
+\end{minted}
+    \begin{itemize}
+    \item Các thuộc tính Họ và tên, Ngày sinh, CCCD, SĐT bắt buộc phải có lúc khởi tạo.
+    \item Địa chỉ, Tiền sử bệnh án, Dị ứng có thể để trống.
+    \item Mã bệnh nhân, Thời điểm đăng ký sẽ được tạo tự động qua logic hệ thống.
+    \item Lịch sử khám sẽ đặt là NULL
+    \end{itemize}
+    \item \textbf{str()}
+\begin{minted}[escapeinside=||]{python3}
+|\bf Str| str()
+\end{minted}
+\begin{itemize}
+    \item Trả về Chuỗi ngắn gồm Mã BN, Họ tên và CCCD.
+\end{itemize}
+    \item \textbf{add\_examination\_record()}
+\begin{minted}[escapeinside=||]{python3}
+|\bf Void| add_examination_record( exam_date, exam_type, result, notes="", doctor_id, clinic_id)
+\end{minted}
+\begin{itemize}
+    \item Thêm một bản ghi lịch sử khám cho bệnh nhân. Thêm vào cuối LinkedList
+    \item Loại khám, kết quả khám phải được điền.
+    \item Ghi chú có thể để trống
+    \item Ngày khám, phòng khám, bác sĩ sẽ được tạo tự động qua logic hệ thống.
+\end{itemize}
+    \item \textbf{display\_detailed\_info()}
+\begin{minted}[escapeinside=||]{python3}
+|\bf Void| display_detailed_info()
+\end{minted}
+\begin{itemize}
+    \item Trả về chuỗi nhiều dòng gồm tất cả chi tiết thông tin bệnh nhân.
+\end{itemize}
+\item Ngoài ra còn có các phương thức phụ khác để đọc và ghi dữ liệu file lưu trữ.
+\end{itemize}
+
+
+\subsubsection{Cấu trúc PatientInQueue}
+\red{Cấu trúc Phần tử chờ khám:} Đại diện cho một bệnh nhân đang trong hàng đợi khám bệnh.
+\begin{minted}[escapeinside=||]{python3}
+|\bf ADT| PatientInQueue
+    |\bf Patient| patient_profile #Hồ sơ thông tin
+    |\bf Str| patient_id #Mã bệnh nhân lấy từ Hồ sơ
+    |\bf Int| priority
+    |\bf datetime| registration_time
+    |\bf int| absent_count #Số lần vắng khi được gọi
+\end{minted}
+Bao gồm các phương thức:
+\begin{itemize}
+    \item \textbf{Khởi tạo}
+\begin{minted}[escapeinside=||]{python3}
+|\bf Void| init(patient_profile_obj, priority_str_val, registration_timestamp=None)
+\end{minted}
+    \begin{itemize}
+    \item Khởi tạo phải có hồ sơ bệnh nhân và mức độ ưu tiên.
+    \item Mức độ ưu tiên sẽ được ánh xạ từ 
+    $$\begin{array}{|l|l|}
+    \hline
+         \text{Mức độ ưu tiên}& \text{Số} \\\hline
+         \text{Tái khám}& 1\\\hline
+         \text{Thông thường}& 2\\\hline
+         \text{Ưu tiên}& 3\\\hline
+         \text{Ưu tiên cao}& 4\\\hline
+         \text{Cấp cứu}& 5\\\hline
+    \end{array}$$
+    \item Thời điểm đăng ký sẽ được tạo tự động qua logic hệ thống
+    \item Số lần vắng khi được gọi của bệnh nhân sẽ được đặt bằng 0.
+    \end{itemize}
+    \item \textbf{increment\_absent\_count()}
+\begin{minted}[escapeinside=||]{python3}
+|\bf Void| increment_absent_count()
+    self.absent_count = self.absent_count+1
+    return
+\end{minted}
+\begin{itemize}
+    \item Tăng số lần vắng mặt của bệnh nhân lên 1.
+\end{itemize}
+    \item \textbf{should\_leave\_queue()}
+\begin{minted}[escapeinside=||]{python3}
+|\bf Bool| should_leave_queue()
+    if self.absent_count>=3 return True
+    return False
+\end{minted}
+\begin{itemize}
+    \item Kiểm tra xem bệnh nhân có nên bị loại khỏi hàng đợi không.
+    \item Trả về True nếu absent\_count lớn hơn hoặc bằng 3, ngược lại False
+\end{itemize}
+\item \textbf{get\_priority\_display\_name()}
+\begin{minted}[escapeinside=||]{python3}
+|\bf String| get_priority_display_name()
+\end{minted}
+\begin{itemize}
+    \item Trả về mức độ ưu tiên của bệnh nhân.
+\end{itemize}
+\item \textbf{str()}
+\begin{minted}[escapeinside=||]{python3}
+|\bf String| str()
+\end{minted}
+\begin{itemize}
+    \item Trả về một chuỗi mô tả đối tượng bệnh nhân trong hàng đợi. Bao gồm ID, Tên, Tên ưu tiên (giá trị số ưu tiên), thời gian đăng ký (chỉ giờ:phút:giây), và số lần vắng.
+\end{itemize}
+\item \textbf{greater\_than()}
+\begin{minted}[escapeinside=||]{python3}
+|\bf Bool| greater_than()
+\end{minted}
+\begin{itemize}
+    \item Định nghĩa toán tử so sánh > cho hai đối tượng PatientInQueue
+\end{itemize}
+\item \textbf{less\_than()}
+\begin{minted}[escapeinside=||]{python3}
+|\bf Bool| less_than()
+\end{minted}
+\begin{itemize}
+    \item Định nghĩa toán tử so sánh < cho hai đối tượng PatientInQueue
+\end{itemize}
+\end{itemize}
+\subsubsection{Cấu trúc Doctor}
+\red{Cấu trúc Bác sĩ:} Đại diện cho một bác sĩ trong hệ thống.
+\begin{minted}[escapeinside=||]{python3}
+|\bf ADT| Doctor
+    |\bf str| doctor_id #Mã bác sĩ
+    |\bf Str| doctor_name #Họ tên Bác sĩ
+    |\bf str| specialty #Chuyên khoa
+    |\bf List| clinic_id_list #Danh sách phòng khám làm việc
+\end{minted}
+Bao gồm các phương thức:
+\begin{itemize}
+    \item \textbf{Khởi tạo}
+\begin{minted}[escapeinside=||]{python3}
+|\bf Void| init(self, doctor_id, doctor_name, specialty, clinic_id_list_str="")
+\end{minted}
+\begin{itemize}
+    \item Yêu cầu đầu vào các thông tin gồm tên bác sĩ, chuyên khoa.
+    \item Phòng làm việc có thể để trống
+    \item Mã bác sĩ được tạo tự động qua logic hệ thống.
+\end{itemize}
+    \item \textbf{str()}
+\begin{minted}[escapeinside=||]{python3}
+|\bf Str| str()
+\end{minted}
+\begin{itemize}
+    \item Trả về một chuỗi mô tả đối tượng bác sĩ. Dùng để hiển thị thông tin bác sĩ một cách ngắn gọn.
+\end{itemize}
+\item \textbf{add\_to\_clinic}
+\begin{minted}[escapeinside=||]{python3}
+|\bf Void| add_to_clinic(clinic)
+\end{minted}
+\begin{itemize}
+    \item Gán một phòng khám vào danh sách phòng khám bác sĩ làm việc
+\end{itemize}
+\item Ngoài ra còn có các phương thức phụ khác để đọc và ghi dữ liệu file lưu trữ.
+\end{itemize}
+\subsubsection{Clinic}
+\red{Cấu trúc Phòng khám:} Đại diện cho một phòng khám trong hệ thống.
+\begin{minted}[escapeinside=||]{python3}
+|\bf ADT| Doctor
+    |\bf str| clinic_id #Mã phòng khám
+    |\bf Str| clinic_name #Tên phòng khám
+    |\bf str| clinic_specialty #Chuyên khoa chính
+    |\bf List| doctor_id_list #Danh sách bác sĩ làm việc
+\end{minted}
+Bao gồm các phương thức:
+\begin{itemize}
+    \item \textbf{Khởi tạo}
+\begin{minted}[escapeinside=||]{python3}
+|\bf Void| init(self, clinic_id, clinic_name, clinic_specialty_val, doctor_id_list_str="")
+\end{minted}
+\begin{itemize}
+    \item Yêu cầu đầu vào các thông tin gồm tên Phòng khám, chuyên khoa.
+    \item Danh sách bác sĩ làm việc có thể để trống
+    \item Mã phòng khám được tạo tự động qua logic hệ thống.
+\end{itemize}
+    \item \textbf{str()}
+\begin{minted}[escapeinside=||]{python3}
+|\bf Str| str()
+\end{minted}
+\begin{itemize}
+    \item Trả về một chuỗi mô tả đối tượng phòng khám. Dùng để hiển thị thông tin phòng khám một cách ngắn gọn.
+\end{itemize}
+\item \textbf{add\_to\_doctor}
+\begin{minted}[escapeinside=||]{python3}
+|\bf Void| add_to_doctor(doctor)
+\end{minted}
+\begin{itemize}
+    \item Gán một bác sĩ vào làm việc ở phòng khám.
+\end{itemize}
+\item Ngoài ra còn có các phương thức phụ khác để đọc và ghi dữ liệu file lưu trữ.
+\end{itemize}

@@ -1,0 +1,43 @@
+\section{Lựa chọn các cấu trúc dữ liệu cơ bản}
+Sau khi đã xác định rõ các yêu cầu của hệ thống quản lý khám bệnh, bước tiếp theo là lựa chọn các cấu trúc dữ liệu phù hợp để lưu trữ và xử lý thông tin một cách hiệu quả. Việc lựa chọn đúng cấu trúc dữ liệu sẽ ảnh hưởng trực tiếp đến hiệu năng của các thao tác chính như quản lý hồ sơ bệnh nhân, quản lý hàng đợi khám, và tìm kiếm thông tin.
+\begin{itemize}
+    \item \hi{Lưu trữ và Quản lý Hồ sơ Bệnh nhân}
+    \begin{itemize}
+        \item {\bf Cấu trúc dữ liệu sử dụng:} \red{Bảng băm}.
+        \item {\bf Mô tả:} Mỗi phần tử trong bảng băm sẽ có "key" là Mã bệnh nhân (được thiết kế để là duy nhất). "Value" tương ứng với "key" này sẽ là một đối tượng chứa toàn bộ thông tin chi tiết của bệnh nhân đó.
+        \item {\bf Mở rộng:} Tạo thêm cơ chế chỉ mục phụ để tối ưu tìm kiếm hồ sơ bệnh nhân theo số điện thoại, tên, mã BHYT hoặc CCCD/CMND/hộ chiếu.
+        \item {\bf Lý do lựa chọn:}
+        \begin{itemize}
+            \item Bảng băm cho phép thực hiện các thao tác thêm mới (insert), xóa (delete), cập nhật (update) và tìm kiếm (search) hồ sơ bệnh nhân theo Mã bệnh nhân với độ phức tạp thời gian trung bình là O(1). 
+            \item Quản lý ID duy nhất: Phù hợp với việc quản lý bệnh nhân thông qua một mã định danh duy nhất.
+        \end{itemize}
+    \end{itemize}
+    \item \hi{Quản lý Hàng đợi chờ khám theo mức độ ưu tiên}
+    \begin{itemize}
+        \item {\bf Cấu trúc dữ liệu sử dụng:} \red{Hàng đợi ưu tiên}, được triển khai bằng cấu trúc dữ liệu \red{Max - Heap}.
+        \item {\bf Mô tả:} Mỗi phần tử trong Heap sẽ đại diện cho một bệnh nhân đang chờ khám. Phần tử này cần lưu trữ các thông tin sau để phục vụ cho việc so sánh và sắp xếp:
+        \begin{itemize}
+            \item Tham chiếu đến Hồ sơ bệnh nhân (ví dụ: Mã bệnh nhân).
+            \item Mức độ ưu tiên (một giá trị số, ví dụ: Cấp cứu - 5, Rất ưu tiên - 4, Ưu tiên - 3, Thông thường - 2, Tái khám - 1).
+            \item Thời gian đăng ký khám (timestamp): Được sử dụng làm tiêu chí phụ khi so sánh hai bệnh nhân có cùng mức độ ưu tiên. Bệnh nhân có timestamp nhỏ hơn (đến sớm hơn) sẽ được ưu tiên hơn.
+        \end{itemize}
+        \item {\bf Mở rộng:} Nếu một bệnh nhân đã chờ quá một khoảng thời gian xác định, hệ thống có thể tự động tăng mức độ ưu tiên của họ. Việc cập nhật mức độ ưu tiên của một phần tử trong heap và duy trì cấu trúc heap cũng có độ phức tạp O(log M).
+        \item {\bf Lý do lựa chọn:} 
+        \begin{itemize}
+            \item Xử lý ưu tiên hiệu quả: Heap tự nhiên hỗ trợ việc tìm và loại bỏ phần tử có ưu tiên cao nhất (gốc của heap) với độ phức tạp thời gian $O(\log N)$ (với $N$ là số bệnh nhân trong hàng đợi). Thao tác thêm một bệnh nhân mới vào hàng đợi cũng có độ phức tạp $O(\log N)$.
+            \item Đáp ứng tiêu chí kép: Việc so sánh các phần tử trong heap có thể được tùy chỉnh để xét mức độ ưu tiên trước, sau đó mới đến thời gian đăng ký, đảm bảo đúng quy tắc "ưu tiên cao hơn được khám trước, nếu cùng ưu tiên thì ai đến sớm hơn được khám trước".
+            \item Hiển thị hàng đợi: Việc lấy danh sách bệnh nhân theo thứ tự ưu tiên (ví dụ, để hiển thị) có thể được thực hiện bằng cách lấy lần lượt các phần tử từ heap.
+        \end{itemize}
+    \end{itemize}
+    \item \hi{Lưu trữ Lịch sử các lần khám trong Hồ sơ bệnh nhân.}
+    \begin{itemize}
+        \item {\bf Cấu trúc dữ liệu sử dụng:} \red{Danh sách liên kết (Linked List)}.
+        \item {\bf Lý do lựa chọn: }
+        \begin{itemize}
+            \item Số lượng động: Một bệnh nhân có thể có số lượng lần khám không cố định. Cả danh sách liên kết và mảng động đều cho phép lưu trữ một số lượng phần tử thay đổi.
+            \item Thêm dễ dàng: Việc thêm một lần khám mới vào lịch sử tương đối đơn giản với cả hai cấu trúc này.
+        \end{itemize}
+
+    \end{itemize}
+\end{itemize}
+
