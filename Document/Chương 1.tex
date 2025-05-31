@@ -1,0 +1,116 @@
+\section{Xác định bài toán}
+Đầu tiên, ta sẽ xác định, phân tích bài toán để có thể lên kế hoạch xây dựng cấu trúc dữ liệu và giải thuật phù hợp để giải quyết bài toán.
+\subsection{Các vấn đề đặt ra}
+\begin{block}{Bài toán quản lý hệ thống khám bệnh}
+Xây dựng một hệ thống giúp quản lý danh sách bệnh nhân theo mức độ ưu tiên (cấp cứu, thông thường, tái khám, v.v..). Xử lí gọi bệnh nhân vào khám theo mức độ ưu tiên, nếu có nhiều bệnh nhân có cùng mức độ ưu tiên, ưu tiên bệnh nhân đến sớm hơn. Cập nhật trạng thái khi đã khám xong. Có thể đưa ra danh sách bệnh nhân, tìm kiếm thông tin bệnh nhân theo các tiêu chí.
+\end{block}
+\noindent Ngoài ra, ta có \textcolor{FamiBlue}{\bf Minh hoạ về một buổi đến khám của một bệnh nhân:}\begin{center}\textcolor{HustRed}{ Thực hiện thủ tục đăng ký khám bệnh} $\rightarrow\,$\textcolor{HustRed}{  Chờ khám} $\rightarrow\,$\textcolor{HustRed}{  Khám.}\end{center}
+\noindent Từ đó, ta sẽ xác định những chi tiết nghiệp vụ cần quản lý trong tổng thể bài toán như sau:
+\begin{itemize}
+    \item Quản lý \textcolor{FamiBlue}{\bf Hồ sơ} bệnh nhân
+    \begin{itemize}
+        \item Các trường thông tin cần có
+        \item Thao tác tạo Hồ sơ
+        \item Thao tác cập nhật hồ sơ
+        \item Thao tác xoá hồ sơ
+        \item Hiển thị thông tin bệnh nhân
+        \item Lưu trữ vả tải hồ sơ bệnh nhân từ file.
+    \end{itemize}
+    \item Quản lý \textcolor{FamiBlue}{\bf quy trình vào khám} của bệnh nhân:
+    \begin{itemize}
+        \item Đăng ký khám bệnh (Đăng ký trực tiếp và đặt lịch hẹn)
+        \item Hàng đợi chờ khám
+        \item Đưa bệnh nhân vào hàng đợi chờ khám
+        \item Gọi bệnh nhân vào khám
+        \item Cập nhật trạng thái hồ sơ bệnh nhân
+        \item Xử lí trường hợp bệnh nhân rời đi khi đang chờ, vắng mặt khi được gọi.
+    \end{itemize}
+    \item Quản lý hàng đợi khám theo mức độ \textcolor{FamiBlue}{\bf Ưu tiên}:
+    \begin{itemize}
+        \item Các tiêu chí ưu tiên
+        \item Các mức độ ưu tiên tương ứng với từng tiêu chí
+        \item Một bệnh nhân không phải chờ quá lâu hay chờ vô hạn
+        \item Cập nhật mức độ ưu tiên của bệnh nhân
+        \item Lựa chọn bệnh nhân vào khám (bệnh nhân có mức độ ưu tiên cao nhất và đến sớm hơn trong trường hợp có cùng mức độ ưu tiên).
+    \end{itemize}
+    \item Quản lý \textcolor{FamiBlue}{\bf Lưu trữ} và \textcolor{FamiBlue}{\bf Tìm kiếm} Hồ sơ bệnh nhân:
+    \begin{itemize}
+        \item Cách thức lưu trữ hồ sơ bệnh nhân
+        \item Đưa ra danh sách bệnh nhân (Đang chờ khám / Đã khám / Theo tiêu chí)
+        \item Tìm kiếm hồ sơ bệnh nhân theo tiêu chí (Xác định các tiêu chí và thuật toán).
+    \end{itemize}
+\end{itemize}
+\subsection{Đặc tả yêu cầu}
+Dựa trên các vấn đề đã được xác định, hệ thống quản lý khám bệnh cần đáp ứng các yêu cầu sau:
+\begin{itemize}
+    \item \hi{Quản lí hồ sơ bệnh nhân}
+    \begin{itemize}
+        \item \hi{Tạo hồ sơ bệnh nhân mới:} Hệ thống cho phép nhân viên y tế tạo hồ sơ mới cho bệnh nhân. Các thông tin cần lưu trữ bao gồm:
+        \begin{itemize}
+            \item Mã bệnh nhân (được tạo tự động, duy nhất)
+            \item Họ tên (Bắt buộc)
+            \item Ngày sinh (Bắt buộc)
+            \item Giới tính (Bắt buộc)
+            \item Địa chỉ
+            \item Số điện thoại (Bắt buộc)
+            \item Số Căn cước công dân (Bắt buộc)
+            \item Bảo hiểm y tế
+            \item Tiền sử bệnh án
+            \item Dị ứng thuốc
+            \item Thời điểm đăng ký (được tạo tự động)
+            \item Lịch sử khám bệnh. (Danh sách gồm Ngày khám, kết quả khám, ghi chú)
+        \end{itemize}
+        \item \hi{Cập nhật thông tin hồ sơ bệnh nhân:} Hệ thống cho phép nhân viên y tế tìm kiếm và cập nhật thông tin trong hồ sơ bệnh nhân đã có.
+        \item \hi{Xóa hồ sơ bệnh nhân:} Hệ thống cho phép nhân viên có thẩm quyền xóa hồ sơ bệnh nhân (có thể là xóa mềm - đánh dấu đã xóa, hoặc xóa vĩnh viễn tùy theo quy định). Cần có cơ chế xác nhận trước khi xóa.
+        \item \hi{Hiển thị thông tin bệnh nhân:} Hệ thống cho phép tra cứu và hiển thị chi tiết thông tin của một bệnh nhân dựa trên mã bệnh nhân hoặc các tiêu chí tìm kiếm khác (ví dụ: họ tên, số điện thoại).
+    \end{itemize}
+    \item \hi{Quản lý hàng đợi chờ khám}
+    \begin{itemize}
+        \item \hi{Thêm bệnh nhân vào hàng đợi:} Sau khi đăng ký, bệnh nhân được tự động thêm vào hàng đợi chờ khám tương ứng với mức độ ưu tiên và thời gian đăng ký.
+        \item \hi{Hiển thị hàng đợi:} Hệ thống hiển thị danh sách bệnh nhân đang chờ khám, sắp xếp theo thứ tự ưu tiên (ưu tiên cao nhất lên trước, trong cùng mức ưu tiên thì ai đến sớm hơn sẽ lên trước). Thông tin hiển thị có thể bao gồm: STT, Mã bệnh nhân, Tên bệnh nhân, Mức độ ưu tiên, Thời gian chờ dự kiến (nếu có thể tính toán).
+        \item \hi{Gọi bệnh nhân vào khám:} Hệ thống cho phép nhân viên y tế (hoặc bác sĩ) gọi bệnh nhân tiếp theo từ hàng đợi dựa trên quy tắc ưu tiên (mức độ ưu tiên cao nhất và đến sớm nhất). Hệ thống cập nhật trạng thái của bệnh nhân từ "Đang chờ" sang "Đang khám".
+        \item \hi{Cập nhật trạng thái sau khám}
+        \begin{itemize}
+            \item Sau khi khám xong, nhân viên y tế cập nhật trạng thái của bệnh nhân thành "Đã khám"
+            \item Ghi nhận kết quả khám
+        \end{itemize}
+        \item \hi{Xử lý trường hợp đặc biệt:}
+        \begin{itemize}
+            \item \hi{Bệnh nhân rời đi khi đang chờ:} Hệ thống cho phép nhân viên ghi nhận trường hợp bệnh nhân tự ý rời đi trước khi được khám và xóa bệnh nhân khỏi hàng đợi.
+            \item \hi{Bệnh nhân vắng mặt khi được gọi:} Hệ thống cho phép ghi nhận bệnh nhân vắng mặt. Có thể có cơ chế cho phép gọi lại sau một khoảng thời gian nhất định hoặc chuyển xuống cuối hàng đợi/hàng đợi riêng.
+        \end{itemize}
+    \end{itemize}
+    \item \hi{Quản lý hàng đợi khám theo mức độ ưu tiên}
+    \begin{itemize}
+        \item \hi{Định nghĩa các mức độ ưu tiên:} Hệ thống cho phép định nghĩa và quản lý các mức độ ưu tiên khác nhau (ví dụ: Cấp cứu, Rất ưu tiên, Ưu tiên, Thông thường, Tái khám). Mỗi mức độ ưu tiên có một giá trị/trọng số để so sánh.
+        \item \hi{Gán mức độ ưu tiên cho bệnh nhân:}
+        \begin{itemize}
+            \item Khi đăng ký, nhân viên y tế đánh giá và gán mức độ ưu tiên cho bệnh nhân dựa trên tình trạng sức khỏe hoặc các tiêu chí đã định sẵn (ví dụ: người già, trẻ em, phụ nữ mang thai, có giấy chuyển tuyến ưu tiên).
+            \item Hệ thống ghi nhận mức độ ưu tiên này cùng với thông tin bệnh nhân trong hàng đợi.
+        \end{itemize}
+        \item \hi{Cập nhật mức độ ưu tiên:} Trong một số trường hợp, hệ thống cho phép nhân viên y tế có thẩm quyền thay đổi mức độ ưu tiên của bệnh nhân đang chờ nếu tình trạng của họ thay đổi.
+        \item \hi{Lựa chọn bệnh nhân vào khám theo ưu tiên:}
+        \begin{itemize}
+            \item Khi gọi bệnh nhân tiếp theo, hệ thống phải tự động chọn bệnh nhân có mức độ ưu tiên cao nhất.
+            \item Nếu có nhiều bệnh nhân cùng mức độ ưu tiên cao nhất, hệ thống sẽ chọn bệnh nhân có thời gian đăng ký/đến sớm nhất (First Come First Served - FCFS trong cùng mức ưu tiên).
+        \end{itemize}
+        \item \hi{Chống chờ đợi vô hạn (Starvation Prevention):} Cần có cơ chế để đảm bảo bệnh nhân ở mức ưu tiên thấp không phải chờ đợi quá lâu một cách vô lý. (Ví dụ: sau một khoảng thời gian chờ nhất định, mức độ ưu tiên của bệnh nhân có thể được tăng lên).
+    \end{itemize}
+    \item \hi{Quản lý lưu trữ và tìm kiếm hồ sơ bệnh nhân}
+    \begin{itemize}
+        \item \hi{Lưu trữ hồ sơ bệnh nhân:} Hệ thống phải lưu trữ toàn bộ thông tin hồ sơ bệnh nhân và lịch sử khám bệnh một cách an toàn và bảo mật. \red{Dữ liệu hồ sơ bệnh nhân được lưu trữ trong 1 file}.
+        \item \hi{Tìm kiếm hồ sơ bệnh nhân:} Hệ thống cung cấp chức năng tìm kiếm bệnh nhân theo nhiều tiêu chí:
+        \begin{itemize}
+            \item Mã bệnh nhân
+            \item Họ và tên (tìm kiếm gần đúng)
+            \item Số điện thoại (tìm kiếm gần đúng)
+            \item Ngày sinh
+        \end{itemize}
+        \item \hi{Thống kê và báo cáo (Danh sách bệnh nhân):}
+        \begin{itemize}
+            \item Danh sách bệnh nhân đang chờ khám.
+            \item Danh sách bệnh nhân đã khám (trong ngày, trong khoảng thời gian tùy chọn).
+            \item Danh sách tất cả bệnh nhân.
+        \end{itemize}
+    \end{itemize}
+\end{itemize}
