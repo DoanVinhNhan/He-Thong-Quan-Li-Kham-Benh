@@ -5,7 +5,7 @@ Phiên bản: 1.2 (Cập nhật ngày 31/05/2025 - Thêm Quản lý Bác sĩ, Ph
 
 1. Yêu cầu về môi trường:
    - Python 3.7+
-   - Thư viện customtkinter: Cài đặt bằng lệnh `pip install customtkinter`
+   - Thư viện customtkinter: Cài đặt bằng lệnh `pip3 install customtkinter`
    (Không yêu cầu thư viện bên ngoài nào khác cho logic cốt lõi của chương trình).
 
 2. Cách chạy chương trình:
