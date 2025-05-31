@@ -1,0 +1,125 @@
+\documentclass[a4paper, 12pt]{article}
+\usepackage[left=2.5cm, right=2.5cm, top=2.5cm, bottom=2.5cm]{geometry}
+\usepackage[utf8]{vietnam}
+\usepackage{lmodern}
+\usepackage{hyperref}
+\usepackage{microtype}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows.meta}
+\usepackage{graphicx}
+\usepackage{fancyhdr}
+\usepackage{indentfirst}
+\usepackage{enumitem}
+\usepackage{algorithm}
+\definecolor{customkwcolor}{rgb}{0.5, 0.0, 0.5}
+\newcommand{\nullt}{\textcolor{customkwcolor}{\textbf{NULL}}}
+\usepackage[noend]{algpseudocode}
+\makeatletter
+\def\BState{\State\hskip-\ALG@thistlm}
+\makeatother
+\usepackage{listings}
+\lstdefinestyle{cppstyle}{ 
+   language=C++, 
+   basicstyle=\ttfamily\small,  % Use a monospaced font 
+   keywordstyle=\color{blue},    % Keywords in blue 
+   commentstyle=\color{green},    % Comments in green 
+   stringstyle=\color{red},      % Strings in red 
+   numbers=left,                 % Line numbers on the left 
+   numberstyle=\tiny\color{gray}, % Style for line numbers 
+   stepnumber=1,                 % Number every line 
+   numbersep=5pt,                % Distance between line numbers and code 
+   frame=single,                 % Frame around the code 
+   backgroundcolor=\color{white}, % Background color 
+   showstringspaces=false,       % Don't show spaces in strings 
+   tabsize=2                     % Tab size 
+} 
+\usepackage{mathtools, amssymb, amsthm}
+\newcommand{\hi}[1]{\textbf{\textcolor{FamiBlue}{#1}}}
+\newcommand{\red}[1]{\textcolor{HustRed}{\bf#1}}
+\renewcommand{\labelitemiii}{$+$}
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{1pt}
+\rhead{\Large\scshape Cấu trúc dữ liệu \&  Giải thuật}
+\lhead{\large\sffamily MI3060 – 20242}
+\cfoot{\large\thepage}
+\usepackage{xcolor}
+\definecolor{sami}{RGB}{1,90,143}
+\definecolor{FamiBlue}{RGB}{2,105,171}
+\definecolor{HustRed}{RGB}{206,22,40}
+\pgfdeclareimage[height=0.065\paperheight]{fami}{fami.png}
+\renewcommand{\ttdefault}{lmtt}
+\newcommand{\abs}[1]{\left\lvert#1\right\rvert}
+\usepackage[explicit]{titlesec}
+\titleformat{\section}[hang]
+{\bfseries}
+{\filright
+\begin{tikzpicture}[baseline]
+\node[
+font=\Large\sffamily, color=white, minimum size=1cm,
+align=center, regular polygon, fill = sami, regular polygon sides = 6, shape border rotate=30, anchor=base
+]{\thesection};
+\end{tikzpicture}
+}
+{7.5pt}
+{\begin{tikzpicture}[baseline]
+ \node[inner sep=7.5pt, minimum size=1cm, 
+    align=left, font=\LARGE\bfseries, color=sami, anchor=base, rectangle, rounded corners=2.5mm]
+    {#1};
+\end{tikzpicture}}
+\usepackage{tcolorbox}
+\newenvironment{block}[1]
+{ 
+\begin{tcolorbox}[%
+      colback=white,
+      colframe=sami,
+      arc=3mm,
+      title={\textbf{\sffamily#1}},
+      colbacktitle = white,
+      coltitle=sami,
+      fonttitle=\bfseries,
+      boxrule=2pt,
+      detach title,
+      before upper={\tcbtitle\vskip5pt\par}
+    ]
+    \begin{minipage}{\textwidth}}
+{\end{minipage}
+\end{tcolorbox}}
+\usepackage{minted}
+\setminted[python3]{linenos, frame=single, mathescape, texcl, numbersep=5pt, xleftmargin=12.5pt, breaklines, breaksymbol={\enskip}, python3=true}
+\setmintedinline{xleftmargin=10pt}
+\DeclareUnicodeCharacter{3BB}{$\lambda$}
+
+\begin{document}
+\begin{tikzpicture}[overlay, remember picture, shift=(current page.north west), x={(current page.north east)}, y={(current page.south west)}]
+\fill[sami, fill opacity =0.75] (0.8,0)-|(0,0.25);
+\fill[sami, fill opacity =0.75] (0,0.95)--(0.7,0.75)--(1,0.8)--(1,1)-|cycle;
+\node[right] at (0.45,0.15) {\includegraphics[width=10cm]{logotile.png}};
+\node at (current page.north east)[below right, xshift = -0.4785\paperwidth, yshift = -0.195\paperheight, align = left, color=FamiBlue, font=\sffamily, scale=1.15]{\large \textbf{KHOA TOÁN - TIN}\\[1pt]Faculty of Mathematics and Informatics};
+\node[xshift=-0.52\paperwidth, yshift=-0.22\paperheight] at (current page.north east) {\pgfuseimage{fami}};
+\node[scale=1, font=\bfseries, color=sami] at (0.5,0.3) {CẤU TRÚC DỮ LIỆU VÀ GIẢI THUẬT};
+\node[scale=2, align=center, color=sami, font=\bfseries] at (0.5,0.4) {HỆ THỐNG QUẢN LÝ KHÁM BỆNH};
+\node[below, scale=1.35] at (0.5,0.49) {
+\begin{tabular}{lll}
+\textbf{Giảng viên hướng dẫn:}& TS. Vương Mai Phương&\\[1ex]
+\textbf{Nhóm sinh viên:}&Đặng Thị Thuỳ Dương &20237318\\&Nguyễn Thị Huệ &20237439\\& Đoàn Vĩnh Nhân &20237376\\
+\end{tabular}
+};
+\end{tikzpicture}
+
+\thispagestyle{empty}
+\newpage
+\input{Nội dung/Mở Đầu}
+\thispagestyle{empty}
+\tableofcontents
+\newpage
+\setcounter{page}{1}
+\input{Nội dung/Chương 1}
+\input{Nội dung/Chương 2}
+\input{Nội dung/Chương 3_1}
+\input{Nội dung/Chương 3_2}
+\input{Nội dung/Chương 3_3}
+\input{Nội dung/Chương 3_4}
+\input{Nội dung/Tổng kết}
+\input{Nội dung/Tài liệu tham khảo}
+\end{document}
