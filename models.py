@@ -98,20 +98,6 @@ class Patient:
                     "ma_phong_kham_kham": fields[5] if len(fields) > 5 else ""
                 }
                 self.examination_history.append(kham_info)
-            # Xử lý trường hợp dữ liệu cũ (Ngày;Kết quả;Ghi chú;Mã BS;Mã PK)
-            # Nếu muốn tương thích ngược (dữ liệu cũ sẽ thiếu "Loại khám")
-            elif 2 <= len(fields) < 3 and len(fields[0]) > 0 : # Ít nhất có ngày và kết quả (cũ)
-                 kham_info = {
-                    "ngay_kham": ng_kham_obj if ng_kham_obj else fields[0],
-                    "loai_kham": "N/A", # Hoặc để trống "" cho dữ liệu cũ
-                    "ket_qua": fields[1], # Đây là kết quả ở dữ liệu cũ
-                    "ghi_chu": fields[2] if len(fields) > 2 else "", # Ghi chú ở dữ liệu cũ
-                    "ma_bac_si_kham": fields[3] if len(fields) > 3 else "",
-                    "ma_phong_kham_kham": fields[4] if len(fields) > 4 else ""
-                }
-                 self.examination_history.append(kham_info)
-
-
     def to_csv_row(self):
         return {"ma_bn": self.patient_id, "ho_ten": self.full_name, "ngay_sinh": self.date_of_birth.strftime(DATE_FORMAT_CSV) if self.date_of_birth else "",
                 "gioi_tinh": self.gender, "dia_chi": self.address, "sdt": self.phone_number, "cccd": self.national_id, "bhyt": self.health_insurance_id, 
