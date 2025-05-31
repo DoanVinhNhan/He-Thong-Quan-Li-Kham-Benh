@@ -149,7 +149,7 @@ class Patient:
                 f"Lịch sử khám:\n  {history_str_display}")
 
 class PatientInQueue: 
-    PRIORITY_MAP = { 'Tái khám': 1, 'Thông thường': 2, 'Ưu tiên thấp': 3, 'Ưu tiên': 3,  'Rất ưu tiên': 4, 'Ưu tiên cao': 4, 'Cấp cứu': 5}
+    PRIORITY_MAP = { 'Tái khám': 1, 'Thông thường': 2, 'Ưu tiên': 3, 'Ưu tiên cao': 4, 'Cấp cứu': 5}
     PRIORITY_DISPLAY_MAP = {v: k for k, v in PRIORITY_MAP.items() if k in ['Tái khám', 'Thông thường', 'Ưu tiên cao', 'Cấp cứu', 'Ưu tiên thấp']}
     if 3 not in PRIORITY_DISPLAY_MAP or PRIORITY_DISPLAY_MAP[3] not in ['Ưu tiên thấp', 'Ưu tiên']: PRIORITY_DISPLAY_MAP[3] = 'Ưu tiên thấp'
 
