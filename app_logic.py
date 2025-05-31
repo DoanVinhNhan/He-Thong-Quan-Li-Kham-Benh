@@ -168,15 +168,27 @@ class MedicalSystemLogic:
         if exam_patient: return exam_patient, f"Gọi BN: {exam_patient.patient_profile.full_name} (ID: {exam_patient.patient_id}) từ PK {clinic_id_val}", "INFO"
         return None, f"Không có BN trong HĐ PK {clinic_id_val}.", "INFO" 
 
-    def complete_examination(self, patient_id_val, exam_result, exam_notes="", attending_doctor_id="", exam_clinic_id=""): 
+    def complete_examination(self, patient_id_val, exam_type, exam_result, exam_notes="", attending_doctor_id="", exam_clinic_id=""): 
         patient_obj = self.find_patient_by_id(patient_id_val) 
         if patient_obj:
-            patient_obj.add_examination_record(datetime.date.today(), exam_result, exam_notes, attending_doctor_id, exam_clinic_id) 
-            is_in_today_list = any(pat.patient_id == patient_obj.patient_id for pat in self.examined_patients_today_list) 
-            if not is_in_today_list: self.examined_patients_today_list.append(patient_obj)
+            # THÊM exam_type VÀO ĐÂY
+            patient_obj.add_examination_record(datetime.date.today(), exam_type, exam_result, exam_notes, attending_doctor_id, exam_clinic_id) 
+            
+            # Kiểm tra xem bệnh nhân đã có trong danh sách khám hôm nay chưa bằng cách duyệt
+            is_in_today_list = False
+            for i in range(len(self.examined_patients_today_list)):
+                pat_in_list = self.examined_patients_today_list.get(i)
+                if pat_in_list.patient_id == patient_obj.patient_id:
+                    is_in_today_list = True
+                    break
+            
+            if not is_in_today_list: 
+                self.examined_patients_today_list.append(patient_obj)
+            
             self._save_data_to_csv(PATIENTS_CSV_FILENAME, Patient, self.patient_records_table)
-            return True, f"BN {patient_obj.full_name} đã khám xong.", "INFO"
+            return True, f"BN {patient_obj.full_name} đã khám xong (Loại: {exam_type}).", "INFO"
         return False, f"Không tìm thấy BN {patient_id_val}.", "ERROR"
+
             
     def handle_absent_called_patient(self, absent_patient_obj, original_clinic_id): 
         if not absent_patient_obj: return True, "Lỗi: Không có BN vắng mặt.", "ERROR" 

@@ -67,11 +67,13 @@ class Patient:
         items_str_py_list = [] 
         for item_dict in self.examination_history: 
             ng_kham_val = item_dict.get('ngay_kham'); ng_kham_str = ng_kham_val.strftime(DATE_FORMAT_CSV) if isinstance(ng_kham_val, datetime.date) else str(ng_kham_val or "")
+            loai_kham_val = str(item_dict.get('loai_kham', "")).replace(HISTORY_FIELD_SEPARATOR, " ").replace(HISTORY_ITEM_SEPARATOR, " ") # MỚI
             kq = str(item_dict.get('ket_qua', "")).replace(HISTORY_FIELD_SEPARATOR, " ").replace(HISTORY_ITEM_SEPARATOR, " ")
             gc = str(item_dict.get('ghi_chu', "")).replace(HISTORY_FIELD_SEPARATOR, " ").replace(HISTORY_ITEM_SEPARATOR, " ")
             ma_bs = str(item_dict.get('ma_bac_si_kham', "")).replace(HISTORY_FIELD_SEPARATOR, " ").replace(HISTORY_ITEM_SEPARATOR, " ")
             ma_pk = str(item_dict.get('ma_phong_kham_kham', "")).replace(HISTORY_FIELD_SEPARATOR, " ").replace(HISTORY_ITEM_SEPARATOR, " ")
-            items_str_py_list.append(f"{ng_kham_str}{HISTORY_FIELD_SEPARATOR}{kq}{HISTORY_FIELD_SEPARATOR}{gc}{HISTORY_FIELD_SEPARATOR}{ma_bs}{HISTORY_FIELD_SEPARATOR}{ma_pk}")
+            # THAY ĐỔI THỨ TỰ VÀ THÊM TRƯỜNG
+            items_str_py_list.append(f"{ng_kham_str}{HISTORY_FIELD_SEPARATOR}{loai_kham_val}{HISTORY_FIELD_SEPARATOR}{kq}{HISTORY_FIELD_SEPARATOR}{gc}{HISTORY_FIELD_SEPARATOR}{ma_bs}{HISTORY_FIELD_SEPARATOR}{ma_pk}")
         return HISTORY_ITEM_SEPARATOR.join(items_str_py_list)
 
     def _deserialize_examination_history(self, data_str): 
@@ -79,14 +81,36 @@ class Patient:
         items = data_str.split(HISTORY_ITEM_SEPARATOR)
         for item_str in items:
             fields = item_str.split(HISTORY_FIELD_SEPARATOR)
-            if len(fields) >= 3: 
-                ng_kham_obj = None
-                if fields[0]: 
-                    try: ng_kham_obj = datetime.datetime.strptime(fields[0], DATE_FORMAT_CSV).date()
-                    except ValueError: pass 
-                kham_info = {"ngay_kham": ng_kham_obj if ng_kham_obj else fields[0], "ket_qua": fields[1], "ghi_chu": fields[2],
-                             "ma_bac_si_kham": fields[3] if len(fields) > 3 else "", "ma_phong_kham_kham": fields[4] if len(fields) > 4 else ""}
+            ng_kham_obj = None
+            if fields[0]: 
+                try: ng_kham_obj = datetime.datetime.strptime(fields[0], DATE_FORMAT_CSV).date()
+                except ValueError: pass 
+            
+            # Cấu trúc mới: Ngày;Loại Khám;Kết Quả;Ghi Chú;Mã BS;Mã PK
+            # Phải có ít nhất 3 trường cơ bản: Ngày, Loại Khám, Kết Quả
+            if len(fields) >= 3: # fields[0]=Ngày, fields[1]=Loại, fields[2]=Kết quả
+                kham_info = {
+                    "ngay_kham": ng_kham_obj if ng_kham_obj else fields[0], 
+                    "loai_kham": fields[1],  # MỚI
+                    "ket_qua": fields[2], 
+                    "ghi_chu": fields[3] if len(fields) > 3 else "", 
+                    "ma_bac_si_kham": fields[4] if len(fields) > 4 else "", 
+                    "ma_phong_kham_kham": fields[5] if len(fields) > 5 else ""
+                }
                 self.examination_history.append(kham_info)
+            # Xử lý trường hợp dữ liệu cũ (Ngày;Kết quả;Ghi chú;Mã BS;Mã PK)
+            # Nếu muốn tương thích ngược (dữ liệu cũ sẽ thiếu "Loại khám")
+            elif 2 <= len(fields) < 3 and len(fields[0]) > 0 : # Ít nhất có ngày và kết quả (cũ)
+                 kham_info = {
+                    "ngay_kham": ng_kham_obj if ng_kham_obj else fields[0],
+                    "loai_kham": "N/A", # Hoặc để trống "" cho dữ liệu cũ
+                    "ket_qua": fields[1], # Đây là kết quả ở dữ liệu cũ
+                    "ghi_chu": fields[2] if len(fields) > 2 else "", # Ghi chú ở dữ liệu cũ
+                    "ma_bac_si_kham": fields[3] if len(fields) > 3 else "",
+                    "ma_phong_kham_kham": fields[4] if len(fields) > 4 else ""
+                }
+                 self.examination_history.append(kham_info)
+
 
     def to_csv_row(self):
         return {"ma_bn": self.patient_id, "ho_ten": self.full_name, "ngay_sinh": self.date_of_birth.strftime(DATE_FORMAT_CSV) if self.date_of_birth else "",
@@ -104,17 +128,34 @@ class Patient:
                    system_registration_time_str=row_data.get("thoi_diem_dang_ky_he_thong"), examination_history_str=row_data.get("lich_su_kham_benh"))
 
     def __str__(self): return f"BN: {self.patient_id} - {self.full_name} - CCCD: {self.national_id}"
-    def add_examination_record(self, exam_date, result, notes="", doctor_id="", clinic_id=""): 
-        self.examination_history.append({"ngay_kham": exam_date, "ket_qua": result, "ghi_chu": notes, "ma_bac_si_kham": doctor_id, "ma_phong_kham_kham": clinic_id})
+    
+    # THAY ĐỔI SIGNATURE CỦA HÀM
+    def add_examination_record(self, exam_date, exam_type, result, notes="", doctor_id="", clinic_id=""): 
+        self.examination_history.append({
+            "ngay_kham": exam_date, 
+            "loai_kham": exam_type, # MỚI
+            "ket_qua": result, 
+            "ghi_chu": notes, 
+            "ma_bac_si_kham": doctor_id, 
+            "ma_phong_kham_kham": clinic_id
+        })
+
     def display_detailed_info(self): 
         history_items_py_list = [] 
         for hist_dict in self.examination_history: 
             date_display = hist_dict.get('ngay_kham'); bs_info = ""; pk_info = "" 
             if isinstance(date_display, datetime.date): date_display = date_display.strftime(DATE_FORMAT_CSV)
             else: date_display = str(date_display) 
+            
+            loai_kham_display = hist_dict.get('loai_kham', 'N/A') # MỚI
+            ket_qua_display = hist_dict.get('ket_qua','')
+            ghi_chu_display = hist_dict.get('ghi_chu','')
+            
             if hist_dict.get('ma_bac_si_kham'): bs_info = f", BS: {hist_dict.get('ma_bac_si_kham')}"
             if hist_dict.get('ma_phong_kham_kham'): pk_info = f", PK: {hist_dict.get('ma_phong_kham_kham')}"
-            history_items_py_list.append(f"{date_display}: {hist_dict.get('ket_qua','')}{bs_info}{pk_info} (Ghi chú: {hist_dict.get('ghi_chu','')})")
+            
+            # THAY ĐỔI FORMAT HIỂN THỊ
+            history_items_py_list.append(f"{date_display}: Loại: {loai_kham_display}, Kết quả: {ket_qua_display}{bs_info}{pk_info} (Ghi chú: {ghi_chu_display})")
         history_str_display = "\n  ".join(history_items_py_list) if history_items_py_list else "Chưa có"
         return (f"Mã BN: {self.patient_id}\n" f"Họ tên: {self.full_name}\n" f"Ngày sinh: {self.date_of_birth.strftime(DATE_FORMAT_CSV) if self.date_of_birth else 'Chưa có'}\n" 
                 f"Giới tính: {self.gender}\n" f"Địa chỉ: {self.address}\n" f"SĐT: {self.phone_number}\n" f"CCCD: {self.national_id}\n" f"BHYT: {self.health_insurance_id}\n" 

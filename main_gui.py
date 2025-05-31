@@ -338,31 +338,50 @@ class MedicalAppGUI(ctk.CTk):
             self.currently_examining_label.configure(text=f"Đang khám (PK: {selected_clinic_id}): Hàng đợi rỗng"); self.current_exam_patient = None; self.current_exam_clinic_id = None
 
     def _complete_current_examination(self): 
-        if not self.current_exam_patient: self._show_gui_message("Chưa có BN được gọi khám.", "ERROR"); return
+        if not self.current_exam_patient: 
+            self._show_gui_message("Chưa có BN được gọi khám.", "ERROR")
+            return
         
-        current_patient_id = self.current_exam_patient.patient_id; current_patient_name = self.current_exam_patient.patient_profile.full_name 
+        current_patient_id = self.current_exam_patient.patient_id
+        current_patient_name = self.current_exam_patient.patient_profile.full_name 
         
+        # HỎI THÊM LOẠI KHÁM
+        exam_type_val = simpledialog.askstring("Loại khám", f"Nhập Loại khám cho BN {current_patient_id} ({current_patient_name}):", parent=self)
+        if exam_type_val is None: # Người dùng bấm Cancel
+            return 
+        if not exam_type_val.strip(): # Nếu để trống thì thông báo
+             self._show_gui_message("Loại khám không được để trống.", "WARNING")
+             return
+
         exam_result_val = simpledialog.askstring("Kết quả khám", f"Kết quả khám cho BN {current_patient_id} ({current_patient_name}):", parent=self) 
-        if exam_result_val is None: return 
+        if exam_result_val is None: 
+            return 
         
-        exam_notes_val = simpledialog.askstring("Ghi chú", f"Ghi chú cho BN {current_patient_id}:", parent=self); exam_notes_val = exam_notes_val or "" 
+        exam_notes_val = simpledialog.askstring("Ghi chú", f"Ghi chú cho BN {current_patient_id}:", parent=self)
+        exam_notes_val = exam_notes_val or "" 
         
         attending_doctor_id_val = simpledialog.askstring("Thông tin khám", "Nhập Mã Bác sĩ khám (ví dụ BS001):", parent=self) 
         attending_doctor_id_val = attending_doctor_id_val.strip().upper() if attending_doctor_id_val else ""
         
-        # Sử dụng current_exam_clinic_id nếu có, nếu không thì hỏi
         exam_clinic_id_val = self.current_exam_clinic_id 
         if not exam_clinic_id_val:
             exam_clinic_id_val_input = simpledialog.askstring("Thông tin khám", "Nhập Mã Phòng khám thực hiện (ví dụ PK001):", parent=self)
             exam_clinic_id_val = exam_clinic_id_val_input.strip().upper() if exam_clinic_id_val_input else ""
         
-        success_flag, message_text, message_lvl = self.medical_system_logic.complete_examination(current_patient_id, exam_result_val, exam_notes_val, attending_doctor_id_val, exam_clinic_id_val) 
+        # TRUYỀN THÊM exam_type_val
+        success_flag, message_text, message_lvl = self.medical_system_logic.complete_examination(
+            current_patient_id, exam_type_val, exam_result_val, exam_notes_val, 
+            attending_doctor_id_val, exam_clinic_id_val
+        ) 
         self._show_gui_message(message_text, message_lvl)
         
         if success_flag: 
-            self.currently_examining_label.configure(text="Đang khám: Chưa có BN / Chưa chọn PK"); self.current_exam_patient = None; self.current_exam_clinic_id = None
-            self._refresh_clinic_queue_display(); self._refresh_full_examination_history_list()
-
+            self.currently_examining_label.configure(text="Đang khám: Chưa có BN / Chưa chọn PK")
+            self.current_exam_patient = None
+            self.current_exam_clinic_id = None
+            self._refresh_clinic_queue_display()
+            self._refresh_full_examination_history_list()
+            
     def _handle_current_patient_absent(self): 
         if not self.current_exam_patient or not self.current_exam_clinic_id:
             self._show_gui_message("Chưa có BN đang được gọi hoặc không rõ PK.", "ERROR"); return
@@ -726,13 +745,29 @@ class MedicalAppGUI(ctk.CTk):
         ctk.CTkButton(filter_action_buttons_frame, text="Lọc Lịch sử", command=self._refresh_full_examination_history_list).pack(pady=5) 
         ctk.CTkButton(filter_action_buttons_frame, text="Xóa bộ lọc", command=self._clear_examination_history_filters).pack(pady=5) 
         history_treeview_frame = ctk.CTkFrame(history_tab_main_frame); history_treeview_frame.pack(expand=True, fill="both", padx=10, pady=5) 
-        history_column_names = ("STT", "MaBN", "TenBN", "NgayKham", "KetQua", "GhiChu", "MaBS", "MaPK") 
+        
+        # THÊM "LoaiKham" VÀO DANH SÁCH CỘT
+        history_column_names = ("STT", "MaBN", "TenBN", "NgayKham", "LoaiKham", "KetQua", "GhiChu", "MaBS", "MaPK") 
         self.full_examination_history_treeview = ttk.Treeview(history_treeview_frame, columns=history_column_names, show="headings", height=18) 
-        for col_header_name in history_column_names: self.full_examination_history_treeview.heading(col_header_name, text=col_header_name.replace("MaBN", "Mã BN").replace("MaPK","Mã PK").replace("TenBN","Tên BN").replace("NgayKham","Ngày Khám").replace("KetQua","Kết Quả").replace("GhiChu","Ghi Chú")) 
+        for col_header_name in history_column_names: 
+            # CẬP NHẬT TIÊU ĐỀ CỘT
+            display_name = col_header_name
+            if col_header_name == "MaBN": display_name = "Mã BN"
+            elif col_header_name == "TenBN": display_name = "Tên BN"
+            elif col_header_name == "NgayKham": display_name = "Ngày Khám"
+            elif col_header_name == "LoaiKham": display_name = "Loại Khám" # MỚI
+            elif col_header_name == "KetQua": display_name = "Kết Quả"
+            elif col_header_name == "GhiChu": display_name = "Ghi Chú"
+            elif col_header_name == "MaBS": display_name = "Mã BS"
+            elif col_header_name == "MaPK": display_name = "Mã PK"
+            self.full_examination_history_treeview.heading(col_header_name, text=display_name) 
+            
         self.full_examination_history_treeview.column("STT", width=40, anchor="center"); self.full_examination_history_treeview.column("MaBN", width=80, anchor="w")
         self.full_examination_history_treeview.column("TenBN", width=150, anchor="w"); self.full_examination_history_treeview.column("NgayKham", width=100, anchor="center")
-        self.full_examination_history_treeview.column("KetQua", width=200, anchor="w"); self.full_examination_history_treeview.column("GhiChu", width=200, anchor="w")
-        self.full_examination_history_treeview.column("MaBS", width=80, anchor="w"); self.full_examination_history_treeview.column("MaPK", width=80, anchor="w")
+        self.full_examination_history_treeview.column("LoaiKham", width=120, anchor="w") # MỚI
+        self.full_examination_history_treeview.column("KetQua", width=180, anchor="w"); self.full_examination_history_treeview.column("GhiChu", width=180, anchor="w")
+        self.full_examination_history_treeview.column("MaBS", width=70, anchor="w"); self.full_examination_history_treeview.column("MaPK", width=70, anchor="w")
+        
         history_list_scrollbar = ttk.Scrollbar(history_treeview_frame, orient="vertical", command=self.full_examination_history_treeview.yview) 
         self.full_examination_history_treeview.configure(yscrollcommand=history_list_scrollbar.set); history_list_scrollbar.pack(side="right", fill="y")
         self.full_examination_history_treeview.pack(expand=True, fill="both")
@@ -748,24 +783,44 @@ class MedicalAppGUI(ctk.CTk):
         to_date_str_val = self.to_date_filter_entry.get().strip() 
         doctor_id_val = self.doctor_id_filter_entry.get().strip().upper() 
         clinic_id_val = self.clinic_filter_entry.get().strip().upper() 
+        
         history_custom_list, message_text, message_lvl = self.medical_system_logic.filter_examination_history( 
-            from_date_str=from_date_str_val if from_date_str_val else None, to_date_str=to_date_str_val if to_date_str_val else None,
-            doctor_id_filter=doctor_id_val if doctor_id_val else None, clinic_id_filter=clinic_id_val if clinic_id_val else None)
-        if message_lvl == "ERROR": self._show_gui_message(message_text, message_lvl); self.full_examination_history_treeview.insert("", "end", values=("", "", message_text, "", "", "", "", "")); return
+            from_date_str=from_date_str_val if from_date_str_val else None, 
+            to_date_str=to_date_str_val if to_date_str_val else None,
+            doctor_id_filter=doctor_id_val if doctor_id_val else None, 
+            clinic_id_filter=clinic_id_val if clinic_id_val else None
+        )
+        
+        if message_lvl == "ERROR": 
+            self._show_gui_message(message_text, message_lvl)
+            self.full_examination_history_treeview.insert("", "end", values=("", "", message_text, "", "", "", "", "", "")) # Cập nhật số lượng cột trống
+            return
+            
         if history_custom_list.is_empty():
              self._show_gui_message(message_text if message_text else "Không có lịch sử khám nào.", "INFO")
-             self.full_examination_history_treeview.insert("", "end", values=("", "", message_text if message_text else "Không có lịch sử khám.", "", "", "", "", ""))
+             self.full_examination_history_treeview.insert("", "end", values=("", "", message_text if message_text else "Không có lịch sử khám.", "", "", "", "", "", "")) # Cập nhật
         else:
             for i in range(len(history_custom_list)):
                 history_record = history_custom_list.get(i) 
                 exam_date_display = history_record.get('ngay_kham') 
-                if isinstance(exam_date_display, datetime.date): exam_date_display = exam_date_display.strftime(DATE_FORMAT_CSV)
+                if isinstance(exam_date_display, datetime.date): 
+                    exam_date_display = exam_date_display.strftime(DATE_FORMAT_CSV)
+                
+                # CẬP NHẬT THỨ TỰ VÀ THÊM TRƯỜNG MỚI
                 self.full_examination_history_treeview.insert("", "end", values=(
-                    i + 1, history_record.get('ma_bn', 'N/A'), history_record.get('ho_ten_bn', 'N/A'),
-                    exam_date_display or 'N/A', history_record.get('ket_qua', 'N/A'), history_record.get('ghi_chu', 'N/A'),
-                    history_record.get('ma_bac_si_kham', 'N/A'), history_record.get('ma_phong_kham_kham', 'N/A')))
-            if message_text and message_lvl == "INFO" and len(history_custom_list) > 0 : self._show_gui_message(message_text, message_lvl)
-
+                    i + 1, 
+                    history_record.get('ma_bn', 'N/A'), 
+                    history_record.get('ho_ten_bn', 'N/A'),
+                    exam_date_display or 'N/A', 
+                    history_record.get('loai_kham', 'N/A'), # MỚI
+                    history_record.get('ket_qua', 'N/A'), 
+                    history_record.get('ghi_chu', 'N/A'),
+                    history_record.get('ma_bac_si_kham', 'N/A'), 
+                    history_record.get('ma_phong_kham_kham', 'N/A')
+                ))
+            if message_text and message_lvl == "INFO" and len(history_custom_list) > 0 : 
+                self._show_gui_message(message_text, message_lvl)
+                
     def _refresh_all_application_lists(self): 
         self._display_all_patients_in_search_tab() 
         self._refresh_full_examination_history_list() 
