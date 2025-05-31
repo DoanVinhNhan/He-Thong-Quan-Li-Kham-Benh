@@ -224,7 +224,7 @@ class CustomHashTable:
 # --- Phần MaxHeap và PriorityQueue ---
 class MaxHeap:
     def __init__(self):
-        self.harr: List['PatientInQueue'] = [] 
+        self.harr: List['PatientInQueue'] = [] # Sử dụng forward declaration cho type hint
         self.n = 0
 
     def _parent(self, i: int) -> int:
@@ -240,6 +240,7 @@ class MaxHeap:
         self.harr[i], self.harr[j] = self.harr[j], self.harr[i]
 
     def _heapify_up(self, i: int):
+        # Đối tượng PatientInQueue cần định nghĩa __gt__ để so sánh trực tiếp
         while i > 0 and self.harr[i] > self.harr[self._parent(i)]: 
             self._swap(i, self._parent(i))
             i = self._parent(i)
@@ -287,9 +288,9 @@ class MaxHeap:
         return self.n == 0
 
     def get_all_elements(self) -> List['PatientInQueue']:
-        return list(self.harr)
+        return list(self.harr) # Trả về bản sao
 
-    def changePriority(self, patientID_to_change: str, new_priority_str: str, PatientInQueue_class_ref) -> bool: # Thêm PatientInQueue_class_ref
+    def changePriority(self, patientID_to_change: str, new_priority_str: str, PatientInQueue_class_ref) -> bool:
         found_index = -1
         for i in range(self.n):
             if self.harr[i].patientID == patientID_to_change:
@@ -298,18 +299,18 @@ class MaxHeap:
         
         if found_index != -1:
             old_priority_numeric = self.harr[found_index].priority
-            # Sử dụng PatientInQueue_class_ref để truy cập PRIORITY_MAP
+            # Sử dụng PatientInQueue_class_ref để truy cập PRIORITY_MAP một cách an toàn
             new_priority_numeric = PatientInQueue_class_ref.PRIORITY_MAP.get(new_priority_str)
             
             if new_priority_numeric is None:
-                # print(f"Lỗi Heap: Mức ưu tiên mới '{new_priority_str}' không hợp lệ.") # app_logic sẽ xử lý log
+                # Lỗi sẽ được xử lý ở tầng cao hơn (app_logic)
                 return False
 
             self.harr[found_index].priority = new_priority_numeric
             
             if new_priority_numeric > old_priority_numeric:
                 self._heapify_up(found_index)
-            else: # new_priority_numeric <= old_priority_numeric
+            else: # new_priority_numeric <= old_priority_numeric (bao gồm cả trường hợp bằng nhau, vẫn cần heapify_down)
                 self._heapify_down(found_index)
             return True
         return False
@@ -337,38 +338,49 @@ class PriorityQueue:
     def updatePriorityForLongWaiters(self, max_wait_time_seconds: int, PatientInQueue_class_ref, priority_increase: int = 1) -> int:
         now = datetime.datetime.now()
         updated_count = 0
-        indices_to_reheapify = []
+        indices_to_reheapify = [] # Lưu index của các phần tử cần heapify_up
 
+        # Duyệt qua bản sao để tránh thay đổi heap trong lúc duyệt, hoặc duyệt cẩn thận
         for idx, patient_in_q in enumerate(self.k.harr): 
             wait_time = (now - patient_in_q.registrationTime).total_seconds()
             if wait_time > max_wait_time_seconds:
+                # Sử dụng PatientInQueue_class_ref để truy cập PRIORITY_MAP
                 max_priority_numeric = max(PatientInQueue_class_ref.PRIORITY_MAP.values())
                 if patient_in_q.priority < max_priority_numeric:
                     old_priority_val = patient_in_q.priority
                     new_priority_val = min(patient_in_q.priority + priority_increase, max_priority_numeric)
                     if new_priority_val != old_priority_val:
-                        patient_in_q.priority = new_priority_val 
-                        indices_to_reheapify.append(idx) 
+                        patient_in_q.priority = new_priority_val # Thay đổi trực tiếp
+                        indices_to_reheapify.append(idx) # Ghi lại index để heapify_up sau
                         updated_count +=1
         
+        # Sau khi thay đổi tất cả các priority cần thiết, giờ mới heapify_up
+        # Sắp xếp indices_to_reheapify giảm dần để heapify_up từ các node sâu hơn trước có thể tốt hơn
+        # nhưng việc heapify từng cái một cũng sẽ đúng nếu _heapify_up xử lý đúng.
         for idx_to_fix in sorted(indices_to_reheapify, reverse=True): 
-             self.k._heapify_up(idx_to_fix) 
+             self.k._heapify_up(idx_to_fix) # Ưu tiên tăng nên heapify_up
         
         return updated_count
 
     def display_queue(self, PatientInQueue_class_ref) -> List[str]: 
         if self.k.is_empty():
             return ["Hàng đợi rỗng."]
+        # Tạo heap tạm thời để không làm thay đổi heap gốc
         temp_heap = MaxHeap()
-        for item_orig in self.k.get_all_elements(): 
-            profile_ref = item_orig.profile 
-            copied_patient_in_q = PatientInQueue_class_ref( # Sử dụng PatientInQueue_class_ref
+        for item_orig in self.k.get_all_elements(): # get_all_elements trả về bản sao
+            # Tạo PatientInQueue mới cho heap tạm để đảm bảo tính độc lập
+            profile_ref = item_orig.profile # Tham chiếu đến profile gốc
+            
+            # Sử dụng PatientInQueue_class_ref để tạo instance mới
+            copied_patient_in_q = PatientInQueue_class_ref( 
                 patient_profile=profile_ref, 
-                priority_str=item_orig.get_priority_display(), 
-                registration_time=item_orig.registrationTime 
+                priority_str=item_orig.get_priority_display(), # Lấy lại chuỗi ưu tiên để khởi tạo
+                registration_time=item_orig.registrationTime # Giữ nguyên thời gian đăng ký
             )
+            # Gán lại chính xác priority số và absentCount
             copied_patient_in_q.priority = item_orig.priority 
             copied_patient_in_q.absentCount = item_orig.absentCount
+            
             temp_heap.add(copied_patient_in_q)
 
         sorted_list_display_strings: List[str] = []
@@ -376,13 +388,18 @@ class PriorityQueue:
         while not temp_heap.is_empty():
             p = temp_heap.removeMax()
             if p:
+                # Thay đổi dấu phẩy phân cách chính giữa các trường thông tin để dễ parse ở GUI
                 display_str = (f"{stt}. ID:{p.patientID},Tên:{p.profile.ho_ten},"
                                f"Ưu tiên:{p.get_priority_display()}({p.priority}),"
                                f"TGĐK:{p.registrationTime.strftime('%H:%M:%S')},"
-                               f"Vắng:{p.absentCount}") # Thay đổi dấu phẩy cho dễ parse ở GUI
+                               f"Vắng:{p.absentCount}") 
                 sorted_list_display_strings.append(display_str)
                 stt += 1
         return sorted_list_display_strings
         
     def thay_doi_uu_tien_benh_nhan(self, patient_id: str, new_priority_str: str, PatientInQueue_class_ref) -> bool:
+        """
+        Thay đổi ưu tiên của một bệnh nhân đã có trong hàng đợi.
+        Sử dụng PatientInQueue_class_ref để truy cập PRIORITY_MAP thông qua MaxHeap.
+        """
         return self.k.changePriority(patient_id, new_priority_str, PatientInQueue_class_ref)
