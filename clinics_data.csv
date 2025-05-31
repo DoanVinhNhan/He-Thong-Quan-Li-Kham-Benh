@@ -1,0 +1,6 @@
+ma_phong_kham,ten_phong_kham,chuyen_khoa_pk,danh_sach_ma_bac_si
+PK001,Phòng khám Nội - Nhi - Tim Mạch,Nội tổng quát - Nhi - Tim mạch,"BS001,BS002,BS003,BS008,BS009"
+PK002,Phòng khám Tai Mũi Họng,Tai mũi họng,"BS002,BS004"
+PK003,Phòng khám Mắt - Đa khoa Tổng hợp,Mắt - Tổng hợp,"BS001,BS007,BS009"
+PK004,Phòng khám Da liễu - Ngoại khoa,Da liễu - Ngoại khoa,"BS003,BS005"
+PK005,Phòng khám Sản Phụ Khoa,Sản phụ khoa,BS006
