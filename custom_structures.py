@@ -1,405 +1,266 @@
 # custom_structures.py
-import datetime
-from typing import Any, List, Optional, Tuple, Iterable
+import datetime 
 
-# --- Phần Custom Linked List ---
-class ListNode:
-    """Nút trong danh sách liên kết."""
-    def __init__(self, value: Any):
-        self.value = value
-        self.next: Optional[ListNode] = None
+# --- Cấu trúc List (Mảng động tùy chỉnh) ---
+class List: 
+    def __init__(self, initial_capacity=10):
+        self._capacity = initial_capacity
+        self._size = 0
+        self._elements = [None] * self._capacity 
 
-    def __str__(self) -> str:
-        return str(self.value)
-
-class CustomLinkedList:
-    """Cấu trúc Danh sách liên kết tùy chỉnh."""
-    def __init__(self):
-        self.head: Optional[ListNode] = None
-        self.tail: Optional[ListNode] = None
-        self._size: int = 0
-
-    def append(self, value: Any) -> None:
-        new_node = ListNode(value)
-        if not self.head:
-            self.head = new_node
-            self.tail = new_node
-        else:
-            if self.tail: # Should always be true if head is not None
-                self.tail.next = new_node
-                self.tail = new_node
-            else: # Should not happen if logic is correct
-                self.head = new_node 
-                self.tail = new_node
-        self._size += 1
-
-    def __len__(self) -> int:
+    def __len__(self):
         return self._size
 
-    def is_empty(self) -> bool:
+    def is_empty(self):
         return self._size == 0
 
-    def __iter__(self) -> Iterable[Any]:
-        """Cho phép duyệt qua danh sách."""
-        current = self.head
-        while current:
-            yield current.value
-            current = current.next
+    def _resize(self, new_capacity):
+        new_elements = [None] * new_capacity
+        for i in range(self._size):
+            new_elements[i] = self._elements[i]
+        self._elements = new_elements
+        self._capacity = new_capacity
 
-    def get_all_elements(self) -> List[Any]:
-        """Trả về một Python list chứa tất cả các phần tử (dùng cho tiện lợi khi cần list)."""
-        return list(self)
+    def append(self, item):
+        if self._size == self._capacity:
+            self._resize(2 * self._capacity if self._capacity > 0 else 1) 
+        self._elements[self._size] = item
+        self._size += 1
 
-    def get(self, index: int) -> Any:
-        """Lấy phần tử tại vị trí index."""
+    def get(self, index):
         if not (0 <= index < self._size):
-            raise IndexError("Chỉ mục ngoài phạm vi danh sách.")
-        current = self.head
-        for _ in range(index):
-            if current:
-                current = current.next
-            else: # Không nên xảy ra nếu logic đúng
-                raise IndexError("Lỗi logic khi duyệt danh sách.")
-        if current:
-            return current.value
-        raise IndexError("Không tìm thấy phần tử.") # Không nên xảy ra
+            raise IndexError("List: Chỉ mục ngoài phạm vi")
+        return self._elements[index]
 
-    def get_last(self) -> Optional[Any]:
-        """Lấy phần tử cuối cùng của danh sách."""
-        if self.tail:
-            return self.tail.value
-        return None
+    def set(self, index, item):
+        if not (0 <= index < self._size): 
+            raise IndexError("List: Chỉ mục ngoài phạm vi để đặt giá trị")
+        self._elements[index] = item
         
-    def __str__(self) -> str:
-        elements = [str(item) for item in self]
-        return "CustomLinkedList: [" + " -> ".join(elements) + "]" if elements else "CustomLinkedList: (empty)"
+    def insert(self, index, item):
+        if not (0 <= index <= self._size): 
+            raise IndexError("List: Chỉ mục chèn ngoài phạm vi")
+        if self._size == self._capacity:
+            self._resize(2 * self._capacity if self._capacity > 0 else 1)
+        for i in range(self._size, index, -1):
+            self._elements[i] = self._elements[i-1]
+        self._elements[index] = item
+        self._size += 1
 
-# --- Phần Custom Hash Table ---
-class HashNode:
-    """
-    Nút trong danh sách liên kết của mỗi bucket trong bảng băm.
-    """
-    def __init__(self, key: Any, value: Any):
-        self.key = key
-        self.value = value
-        self.next: Optional[HashNode] = None
+    def pop(self, index=-1):
+        if self.is_empty():
+            raise IndexError("List: Pop từ danh sách rỗng")
+        actual_index = index
+        if index == -1: actual_index = self._size - 1
+        if not (0 <= actual_index < self._size):
+            raise IndexError("List: Chỉ mục pop ngoài phạm vi")
+        item = self._elements[actual_index]
+        for i in range(actual_index, self._size - 1):
+            self._elements[i] = self._elements[i+1]
+        self._size -= 1
+        self._elements[self._size] = None 
+        if self._size < self._capacity // 4 and self._capacity > 10: 
+            self._resize(self._capacity // 2)
+        return item
 
+    def __iter__(self):
+        for i in range(self._size):
+            yield self._elements[i]
+            
     def __str__(self):
-        return f"({self.key}: {self.value})"
+        if self.is_empty(): return "List:[]"
+        items_str_list = []
+        for i in range(self._size): items_str_list.append(str(self._elements[i]))
+        return "List:[" + ", ".join(items_str_list) + "]"
 
-class CustomHashTable:
-    """
-    Cấu trúc Bảng băm tùy chỉnh sử dụng phương pháp Nối chuỗi (Chaining).
-    """
-    def __init__(self, initial_size: int = 100):
-        if initial_size <= 0:
-            raise ValueError("Kích thước bảng băm phải là số dương.")
-        self.size: int = initial_size
-        self.buckets: List[Optional[HashNode]] = [None] * self.size
-        self.count: int = 0 # Số lượng phần tử hiện có
+# --- LinkedList ---
+class ListNode:
+    def __init__(self, value):
+        self.value = value; self.next_node = None 
+    def __str__(self): return str(self.value)
 
-    def _hash_function(self, key: Any) -> int:
-        """
-        Hàm băm đơn giản cho khóa (key).
-        Đối với chuỗi, tính tổng giá trị ASCII của các ký tự.
-        """
-        if isinstance(key, str):
-            hash_val = sum(ord(char) for char in key)
-        elif isinstance(key, int):
-            hash_val = key
+class LinkedList: 
+    def __init__(self):
+        self.head_node = None; self.tail_node = None; self._list_size = 0 
+    def append(self, value):
+        new_node = ListNode(value)
+        if not self.head_node: self.head_node = new_node; self.tail_node = new_node
         else:
-            # Sử dụng hàm hash() tích hợp của Python cho các kiểu khác và xử lý thêm
-            hash_val = hash(key)
+            if self.tail_node: self.tail_node.next_node = new_node; self.tail_node = new_node
+            else: self.head_node = new_node; self.tail_node = new_node 
+        self._list_size += 1
+    def __len__(self): return self._list_size
+    def is_empty(self): return self._list_size == 0
+    def __iter__(self):
+        current = self.head_node
+        while current: yield current.value; current = current.next_node
+    def get_all_elements_as_list(self): 
+        elements_array = List() 
+        for item in self: elements_array.append(item)
+        return elements_array
+    def get(self, index):
+        if not (0 <= index < self._list_size): raise IndexError("LinkedList: Chỉ mục ngoài phạm vi")
+        current = self.head_node
+        for _ in range(index):
+            if current: current = current.next_node
+            else: raise IndexError("LinkedList: Lỗi logic duyệt")
+        if current: return current.value
+        raise IndexError("LinkedList: Không tìm thấy phần tử")
+    def get_last(self): return self.tail_node.value if self.tail_node else None
+    def __str__(self):
+        elements_str_list_py = [str(item) for item in self] 
+        return "LinkedList:[" + " -> ".join(elements_str_list_py) + "]" if not self.is_empty() else "LinkedList:(empty)"
+
+# --- HashTable ---
+class HashNode:
+    def __init__(self, key, value):
+        self.key = key; self.value = value; self.next_node = None 
+    def __str__(self): return f"({self.key}: {self.value})"
+
+class HashTable: # Đổi tên từ CustomHashTable
+    def __init__(self, initial_table_size=100): # Sử dụng initial_table_size
+        if initial_table_size <= 0: raise ValueError("Kích thước bảng băm phải dương.")
+        self.table_size = initial_table_size 
+        self.buckets_array = List(self.table_size) 
+        for i in range(self.table_size): self.buckets_array.append(None) 
+        self.item_count = 0 
+
+    def _calculate_hash_index(self, key): 
+        if isinstance(key, str): hash_val = sum(ord(char) for char in key)
+        elif isinstance(key, int): hash_val = key
+        else: hash_val = hash(key)
+        return hash_val % self.table_size
+
+    def put_item(self, key, value): 
+        index = self._calculate_hash_index(key)
+        current_hash_node = self.buckets_array.get(index)
+        while current_hash_node:
+            if current_hash_node.key == key: current_hash_node.value = value; return
+            current_hash_node = current_hash_node.next_node
+        new_hash_node = HashNode(key, value)
+        new_hash_node.next_node = self.buckets_array.get(index)
+        self.buckets_array.set(index, new_hash_node) 
+        self.item_count += 1
         
-        return hash_val % self.size
+    def get_item(self, key): 
+        index = self._calculate_hash_index(key)
+        current_hash_node = self.buckets_array.get(index)
+        while current_hash_node:
+            if current_hash_node.key == key: return current_hash_node.value
+            current_hash_node = current_hash_node.next_node
+        return None
 
-    def put(self, key: Any, value: Any) -> None:
-        """
-        Thêm hoặc cập nhật một cặp key-value vào bảng băm.
-        """
-        index = self._hash_function(key)
-        current_node = self.buckets[index]
+    def delete_item(self, key): 
+        index = self._calculate_hash_index(key)
+        current_hash_node = self.buckets_array.get(index); prev_hash_node = None
+        while current_hash_node:
+            if current_hash_node.key == key:
+                if prev_hash_node: prev_hash_node.next_node = current_hash_node.next_node
+                else: self.buckets_array.set(index, current_hash_node.next_node)
+                self.item_count -= 1; return True 
+            prev_hash_node = current_hash_node; current_hash_node = current_hash_node.next_node
+        return False 
 
-        # Duyệt qua danh sách liên kết tại bucket
-        while current_node:
-            if current_node.key == key:
-                current_node.value = value # Cập nhật giá trị nếu khóa đã tồn tại
-                return
-            current_node = current_node.next
-        
-        # Nếu khóa chưa tồn tại, thêm nút mới vào đầu danh sách liên kết
-        new_node = HashNode(key, value)
-        new_node.next = self.buckets[index]
-        self.buckets[index] = new_node
-        self.count += 1
-        
-    def get(self, key: Any) -> Optional[Any]:
-        """
-        Lấy giá trị tương ứng với khóa (key).
-        Trả về None nếu khóa không tồn tại.
-        """
-        index = self._hash_function(key)
-        current_node = self.buckets[index]
+    def contains_key(self, key): 
+        return self.get_item(key) is not None
 
-        while current_node:
-            if current_node.key == key:
-                return current_node.value
-            current_node = current_node.next
-        
-        return None # Khóa không tìm thấy
-
-    def delete(self, key: Any) -> bool:
-        """
-        Xóa một cặp key-value khỏi bảng băm dựa vào khóa.
-        Trả về True nếu xóa thành công, False nếu khóa không tồn tại.
-        """
-        index = self._hash_function(key)
-        current_node = self.buckets[index]
-        prev_node: Optional[HashNode] = None
-
-        while current_node:
-            if current_node.key == key:
-                if prev_node:
-                    prev_node.next = current_node.next
-                else: # Nút cần xóa là nút đầu tiên của bucket
-                    self.buckets[index] = current_node.next
-                self.count -= 1
-                return True # Xóa thành công
-            prev_node = current_node
-            current_node = current_node.next
-            
-        return False # Khóa không tìm thấy để xóa
-
-    def contains(self, key: Any) -> bool:
-        """
-        Kiểm tra xem một khóa (key) có tồn tại trong bảng băm không.
-        """
-        return self.get(key) is not None
-
-    def get_all_values(self) -> List[Any]:
-        """
-        Trả về một danh sách tất cả các giá trị (values) trong bảng băm.
-        Thứ tự không được đảm bảo.
-        """
-        values_list: List[Any] = []
-        for bucket_head in self.buckets:
-            current_node = bucket_head
-            while current_node:
-                values_list.append(current_node.value)
-                current_node = current_node.next
-        return values_list
+    def get_all_values_as_list(self): # Trả về List (CustomArrayList)
+        values_custom_list = List() 
+        for i in range(self.table_size):
+            current_hash_node = self.buckets_array.get(i)
+            while current_hash_node: values_custom_list.append(current_hash_node.value); current_hash_node = current_hash_node.next_node
+        return values_custom_list
     
-    def get_all_key_value_pairs(self) -> List[Tuple[Any, Any]]:
-        """
-        Trả về một danh sách tất cả các cặp (key, value) trong bảng băm.
-        """
-        pairs_list: List[Tuple[Any, Any]] = []
-        for bucket_head in self.buckets:
-            current_node = bucket_head
-            while current_node:
-                pairs_list.append((current_node.key, current_node.value))
-                current_node = current_node.next
-        return pairs_list
+    def get_all_key_value_pairs_as_list(self): # Trả về List (CustomArrayList) các tuple
+        pairs_custom_list = List() 
+        for i in range(self.table_size):
+            current_hash_node = self.buckets_array.get(i)
+            while current_hash_node: pairs_custom_list.append((current_hash_node.key, current_hash_node.value)); current_hash_node = current_hash_node.next_node
+        return pairs_custom_list
 
-    def __len__(self) -> int:
-        return self.count
+    def __len__(self): return self.item_count
+    def is_empty(self): return self.item_count == 0
 
-    def is_empty(self) -> bool:
-        return self.count == 0
-
-    def __str__(self) -> str:
-        elements_str = []
-        for i, bucket_head in enumerate(self.buckets):
-            if bucket_head:
-                bucket_elements = []
-                current_node = bucket_head
-                while current_node:
-                    bucket_elements.append(str(current_node))
-                    current_node = current_node.next
-                elements_str.append(f"  Bucket {i}: {' -> '.join(bucket_elements)}")
-        if not elements_str:
-            return "CustomHashTable: (empty)"
-        return "CustomHashTable:\n" + "\n".join(elements_str)
-
-# --- Phần MaxHeap và PriorityQueue ---
+# --- MaxHeap & CustomPriorityQueue ---
 class MaxHeap:
-    def __init__(self):
-        self.harr: List['PatientInQueue'] = [] # Sử dụng forward declaration cho type hint
-        self.n = 0
-
-    def _parent(self, i: int) -> int:
-        return (i - 1) // 2
-
-    def _left_child(self, i: int) -> int:
-        return 2 * i + 1
-
-    def _right_child(self, i: int) -> int:
-        return 2 * i + 2
-
-    def _swap(self, i: int, j: int):
-        self.harr[i], self.harr[j] = self.harr[j], self.harr[i]
-
-    def _heapify_up(self, i: int):
-        # Đối tượng PatientInQueue cần định nghĩa __gt__ để so sánh trực tiếp
-        while i > 0 and self.harr[i] > self.harr[self._parent(i)]: 
-            self._swap(i, self._parent(i))
-            i = self._parent(i)
-
-    def _heapify_down(self, i: int):
-        max_index = i
-        l = self._left_child(i)
-        if l < self.n and self.harr[l] > self.harr[max_index]:
-            max_index = l
-        
-        r = self._right_child(i)
-        if r < self.n and self.harr[r] > self.harr[max_index]:
-            max_index = r
-        
-        if i != max_index:
-            self._swap(i, max_index)
-            self._heapify_down(max_index)
-
-    def add(self, x: 'PatientInQueue'): 
-        self.harr.append(x)
-        self.n += 1
-        self._heapify_up(self.n - 1)
-
-    def getMax(self) -> Optional['PatientInQueue']: 
-        if self.n == 0:
-            return None
-        return self.harr[0]
-
-    def removeMax(self) -> Optional['PatientInQueue']: 
-        if self.n == 0:
-            return None
-        
-        root = self.harr[0]
-        if self.n > 1:
-            self.harr[0] = self.harr[self.n - 1]
-            self.harr.pop()
-            self.n -= 1 
-            self._heapify_down(0) 
-        elif self.n == 1: 
-            self.harr.pop()
-            self.n -= 1
+    def __init__(self): self.heap_array = List(); 
+    def _get_parent_index(self, i): return (i - 1) // 2 
+    def _get_left_child_index(self, i): return 2 * i + 1 
+    def _get_right_child_index(self, i): return 2 * i + 2 
+    def _swap_elements(self, i, j): 
+        item_i = self.heap_array.get(i); item_j = self.heap_array.get(j)
+        self.heap_array.set(i, item_j); self.heap_array.set(j, item_i)
+    def _sift_up(self, i): 
+        parent_index = self._get_parent_index(i)
+        while i > 0 and self.heap_array.get(i) > self.heap_array.get(parent_index): 
+            self._swap_elements(i, parent_index); i = parent_index
+            parent_index = self._get_parent_index(i)
+    def _sift_down(self, i): 
+        current_size = len(self.heap_array)
+        max_idx = i
+        left_idx = self._get_left_child_index(i); right_idx = self._get_right_child_index(i)
+        if left_idx < current_size and self.heap_array.get(left_idx) > self.heap_array.get(max_idx): max_idx = left_idx
+        if right_idx < current_size and self.heap_array.get(right_idx) > self.heap_array.get(max_idx): max_idx = right_idx
+        if i != max_idx: self._swap_elements(i, max_idx); self._sift_down(max_idx)
+    def add_item(self, item): self.heap_array.append(item); self._sift_up(len(self.heap_array) - 1) 
+    def get_max_item(self): return self.heap_array.get(0) if not self.is_empty() else None 
+    def remove_max_item(self): 
+        if self.is_empty(): return None
+        root = self.heap_array.get(0)
+        if len(self.heap_array) > 1:
+            last_item = self.heap_array.pop() 
+            self.heap_array.set(0, last_item); self._sift_down(0) 
+        elif len(self.heap_array) == 1: self.heap_array.pop()
         return root
-
-    def is_empty(self) -> bool:
-        return self.n == 0
-
-    def get_all_elements(self) -> List['PatientInQueue']:
-        return list(self.harr) # Trả về bản sao
-
-    def changePriority(self, patientID_to_change: str, new_priority_str: str, PatientInQueue_class_ref) -> bool:
-        found_index = -1
-        for i in range(self.n):
-            if self.harr[i].patientID == patientID_to_change:
-                found_index = i
-                break
-        
-        if found_index != -1:
-            old_priority_numeric = self.harr[found_index].priority
-            # Sử dụng PatientInQueue_class_ref để truy cập PRIORITY_MAP một cách an toàn
-            new_priority_numeric = PatientInQueue_class_ref.PRIORITY_MAP.get(new_priority_str)
-            
-            if new_priority_numeric is None:
-                # Lỗi sẽ được xử lý ở tầng cao hơn (app_logic)
-                return False
-
-            self.harr[found_index].priority = new_priority_numeric
-            
-            if new_priority_numeric > old_priority_numeric:
-                self._heapify_up(found_index)
-            else: # new_priority_numeric <= old_priority_numeric (bao gồm cả trường hợp bằng nhau, vẫn cần heapify_down)
-                self._heapify_down(found_index)
+    def is_empty(self): return len(self.heap_array) == 0
+    def get_all_heap_elements(self): return self.heap_array 
+    def change_item_priority(self, item_id_to_change, new_priority_str, patient_in_queue_class_ref): 
+        found_idx = -1
+        for i in range(len(self.heap_array)):
+            if self.heap_array.get(i).patient_id == item_id_to_change: found_idx = i; break
+        if found_idx != -1:
+            patient_obj = self.heap_array.get(found_idx)
+            old_numeric_priority = patient_obj.priority
+            new_numeric_priority = patient_in_queue_class_ref.PRIORITY_MAP.get(new_priority_str)
+            if new_numeric_priority is None: return False
+            patient_obj.priority = new_numeric_priority 
+            if new_numeric_priority > old_numeric_priority: self._sift_up(found_idx)
+            else: self._sift_down(found_idx)
             return True
-        return False
+        return False 
 
-class PriorityQueue: 
-    def __init__(self):
-        self.k: MaxHeap = MaxHeap()
-
+class CustomPriorityQueue: 
+    def __init__(self): self.internal_heap = MaxHeap() 
     @property
-    def Size(self) -> int: 
-        return self.k.n
-
-    def getFirst(self) -> Optional['PatientInQueue']: 
-        return self.k.getMax()
-
-    def removeFirst(self) -> Optional['PatientInQueue']: 
-        return self.k.removeMax()
-
-    def add(self, x: 'PatientInQueue'): 
-        self.k.add(x)
-
-    def is_empty(self) -> bool:
-        return self.k.is_empty()
-
-    def updatePriorityForLongWaiters(self, max_wait_time_seconds: int, PatientInQueue_class_ref, priority_increase: int = 1) -> int:
-        now = datetime.datetime.now()
-        updated_count = 0
-        indices_to_reheapify = [] # Lưu index của các phần tử cần heapify_up
-
-        # Duyệt qua bản sao để tránh thay đổi heap trong lúc duyệt, hoặc duyệt cẩn thận
-        for idx, patient_in_q in enumerate(self.k.harr): 
-            wait_time = (now - patient_in_q.registrationTime).total_seconds()
-            if wait_time > max_wait_time_seconds:
-                # Sử dụng PatientInQueue_class_ref để truy cập PRIORITY_MAP
-                max_priority_numeric = max(PatientInQueue_class_ref.PRIORITY_MAP.values())
-                if patient_in_q.priority < max_priority_numeric:
-                    old_priority_val = patient_in_q.priority
-                    new_priority_val = min(patient_in_q.priority + priority_increase, max_priority_numeric)
-                    if new_priority_val != old_priority_val:
-                        patient_in_q.priority = new_priority_val # Thay đổi trực tiếp
-                        indices_to_reheapify.append(idx) # Ghi lại index để heapify_up sau
-                        updated_count +=1
-        
-        # Sau khi thay đổi tất cả các priority cần thiết, giờ mới heapify_up
-        # Sắp xếp indices_to_reheapify giảm dần để heapify_up từ các node sâu hơn trước có thể tốt hơn
-        # nhưng việc heapify từng cái một cũng sẽ đúng nếu _heapify_up xử lý đúng.
-        for idx_to_fix in sorted(indices_to_reheapify, reverse=True): 
-             self.k._heapify_up(idx_to_fix) # Ưu tiên tăng nên heapify_up
-        
-        return updated_count
-
-    def display_queue(self, PatientInQueue_class_ref) -> List[str]: 
-        if self.k.is_empty():
-            return ["Hàng đợi rỗng."]
-        # Tạo heap tạm thời để không làm thay đổi heap gốc
-        temp_heap = MaxHeap()
-        for item_orig in self.k.get_all_elements(): # get_all_elements trả về bản sao
-            # Tạo PatientInQueue mới cho heap tạm để đảm bảo tính độc lập
-            profile_ref = item_orig.profile # Tham chiếu đến profile gốc
-            
-            # Sử dụng PatientInQueue_class_ref để tạo instance mới
-            copied_patient_in_q = PatientInQueue_class_ref( 
-                patient_profile=profile_ref, 
-                priority_str=item_orig.get_priority_display(), # Lấy lại chuỗi ưu tiên để khởi tạo
-                registration_time=item_orig.registrationTime # Giữ nguyên thời gian đăng ký
-            )
-            # Gán lại chính xác priority số và absentCount
-            copied_patient_in_q.priority = item_orig.priority 
-            copied_patient_in_q.absentCount = item_orig.absentCount
-            
-            temp_heap.add(copied_patient_in_q)
-
-        sorted_list_display_strings: List[str] = []
-        stt = 1
-        while not temp_heap.is_empty():
-            p = temp_heap.removeMax()
-            if p:
-                # Thay đổi dấu phẩy phân cách chính giữa các trường thông tin để dễ parse ở GUI
-                display_str = (f"{stt}. ID:{p.patientID},Tên:{p.profile.ho_ten},"
-                               f"Ưu tiên:{p.get_priority_display()}({p.priority}),"
-                               f"TGĐK:{p.registrationTime.strftime('%H:%M:%S')},"
-                               f"Vắng:{p.absentCount}") 
-                sorted_list_display_strings.append(display_str)
-                stt += 1
-        return sorted_list_display_strings
-        
-    def thay_doi_uu_tien_benh_nhan(self, patient_id: str, new_priority_str: str, PatientInQueue_class_ref) -> bool:
-        """
-        Thay đổi ưu tiên của một bệnh nhân đã có trong hàng đợi.
-        Sử dụng PatientInQueue_class_ref để truy cập PRIORITY_MAP thông qua MaxHeap.
-        """
-        return self.k.changePriority(patient_id, new_priority_str, PatientInQueue_class_ref)
+    def current_size(self): return len(self.internal_heap.heap_array) 
+    def get_first_item(self): return self.internal_heap.get_max_item() 
+    def remove_first_item(self): return self.internal_heap.remove_max_item() 
+    def add_item(self, item): self.internal_heap.add_item(item) 
+    def is_empty(self): return self.internal_heap.is_empty()
+    def update_long_waiter_priority(self, max_wait_time_seconds, patient_in_queue_class_ref, priority_increase=1): 
+        now = datetime.datetime.now(); updated_items_count = 0; indices_to_re_sift = []
+        for idx in range(len(self.internal_heap.heap_array)): 
+            patient_item = self.internal_heap.heap_array.get(idx)
+            if (now - patient_item.registration_time).total_seconds() > max_wait_time_seconds: 
+                max_numeric_prio = max(patient_in_queue_class_ref.PRIORITY_MAP.values())
+                if patient_item.priority < max_numeric_prio:
+                    old_prio = patient_item.priority; new_prio = min(patient_item.priority + priority_increase, max_numeric_prio)
+                    if new_prio != old_prio: patient_item.priority = new_prio; indices_to_re_sift.append(idx); updated_items_count +=1
+        for idx_to_fix in sorted(indices_to_re_sift, reverse=True): self.internal_heap._sift_up(idx_to_fix)
+        return updated_items_count
+    def get_display_queue_as_strings(self, patient_in_queue_class_ref): 
+        display_str_list = List() 
+        if self.internal_heap.is_empty(): display_str_list.append("Hàng đợi rỗng."); return display_str_list
+        temp_display_heap = MaxHeap()
+        for item_original in self.internal_heap.get_all_heap_elements(): 
+            profile_copy = item_original.patient_profile 
+            patient_copy = patient_in_queue_class_ref(profile_copy, item_original.get_priority_display_name(), item_original.registration_time)
+            patient_copy.priority = item_original.priority; patient_copy.absent_count = item_original.absent_count 
+            temp_display_heap.add_item(patient_copy)
+        item_number = 1
+        while not temp_display_heap.is_empty():
+            p_item = temp_display_heap.remove_max_item()
+            if p_item: display_str_list.append(f"{item_number}. ID:{p_item.patient_id},Tên:{p_item.patient_profile.full_name},Ưu tiên:{p_item.get_priority_display_name()}({p_item.priority}),TGĐK:{p_item.registration_time.strftime('%H:%M:%S')},Vắng:{p_item.absent_count}"); item_number+=1
+        return display_str_list
+    def change_queued_patient_priority(self, patient_id, new_priority_str, patient_in_queue_class_ref): 
+        return self.internal_heap.change_item_priority(patient_id, new_priority_str, patient_in_queue_class_ref)
