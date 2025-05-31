@@ -1,6 +1,6 @@
 # models.py
 import datetime
-from custom_structures import CustomLinkedList 
+from custom_structures import CustomLinkedList # Đảm bảo import này đúng
 from typing import Any, Optional, Dict, List 
 
 DATE_FORMAT_CSV = "%Y-%m-%d"
@@ -44,7 +44,7 @@ class PhongKham:
                  danh_sach_ma_bac_si_str: str = ""):
         self.ma_phong_kham = ma_phong_kham
         self.ten_phong_kham = ten_phong_kham
-        self.chuyen_khoa_pk = chuyen_khoa_pk # Đổi tên để tránh trùng với biến cục bộ
+        self.chuyen_khoa_pk = chuyen_khoa_pk 
         self.danh_sach_ma_bac_si: List[str] = []
         if danh_sach_ma_bac_si_str:
             self.danh_sach_ma_bac_si = [bs.strip() for bs in danh_sach_ma_bac_si_str.split(LIST_ID_SEPARATOR) if bs.strip()]
@@ -68,7 +68,6 @@ class PhongKham:
     
     def __str__(self):
         return f"PK: {self.ma_phong_kham} - {self.ten_phong_kham} ({self.chuyen_khoa_pk})"
-
 
 class BenhNhan:
     def __init__(self, ma_bn: str, ho_ten: str, ngay_sinh: Any, gioi_tinh: str, dia_chi: str, sdt: str, cccd: str, 
@@ -113,7 +112,7 @@ class BenhNhan:
         items = data_str.split(HISTORY_ITEM_SEPARATOR)
         for item_str in items:
             fields = item_str.split(HISTORY_FIELD_SEPARATOR)
-            if len(fields) >= 3: # Ít nhất có ngày, kết quả, ghi chú
+            if len(fields) >= 3: 
                 ngay_kham_obj = None
                 if fields[0]: 
                     try: ngay_kham_obj = datetime.datetime.strptime(fields[0], DATE_FORMAT_CSV).date()
@@ -144,7 +143,7 @@ class BenhNhan:
         return cls(
             ma_bn=row.get("ma_bn", ""), ho_ten=row.get("ho_ten", ""), ngay_sinh=row.get("ngay_sinh", ""), 
             gioi_tinh=row.get("gioi_tinh", ""), dia_chi=row.get("dia_chi", ""), sdt=row.get("sdt", ""),
-            cccd=row.get("cccd", "N/A_CSV_LOAD_ERROR"), # Sửa giá trị mặc định nếu thiếu
+            cccd=row.get("cccd", "N/A_CSV_LOAD_ERROR"), 
             bhyt=row.get("bhyt", ""), tien_su_benh_an=row.get("tien_su_benh_an", ""), 
             di_ung_thuoc=row.get("di_ung_thuoc", ""),
             thoi_diem_dang_ky_str=row.get("thoi_diem_dang_ky_he_thong"),
