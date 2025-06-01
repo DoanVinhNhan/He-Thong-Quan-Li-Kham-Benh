@@ -17,13 +17,13 @@ Dữ liệu được lưu trữ trong các tệp CSV: `patients_data.csv`, `doct
 ## 2. Hướng dẫn sử dụng nhanh (Cho người dùng cuối - Phiên bản đóng gói sẵn)
 Đây là cách dễ nhất để chạy ứng dụng mà không cần cài đặt Python hay các thư viện.
 1.  **Tải toàn bộ dự án**:
-    * Nhấn vào nút màu xanh lá cây có chữ **"< > Code"**.
-    * Chọn **"Download ZIP"**.
+    * Tìm đến mục **"Releases"**, Phiên bản 1.3 - Ứng dụng Quản lý Khám Bệnh **"latest"**
+    * Chọn **"Download Source code (Zip)"**.
     * Lưu tệp ZIP này vào máy tính của bạn.
 
 2.  **Giải nén**:
-    * Tìm tệp ZIP bạn vừa tải về (ví dụ: `He-Thong-Quan-Li-Kham-Benh-main.zip`).
-    * Giải nén tệp ZIP này ra một thư mục. Bạn sẽ có một thư mục ví dụ như `He-Thong-Quan-Li-Kham-Benh-main`.
+    * Tìm tệp ZIP bạn vừa tải về (ví dụ: `He-Thong-Quan-Li-Kham-Benh-1.3.zip`).
+    * Giải nén tệp ZIP này ra một thư mục. Bạn sẽ có một thư mục ví dụ như `He-Thong-Quan-Li-Kham-Benh-1.3`.
 
 3.  **Chạy ứng dụng**:
     * Đi vào thư mục bạn vừa giải nén, sau đó vào thư mục con `dist`.
