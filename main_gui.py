@@ -297,25 +297,56 @@ class MedicalAppGUI(ctk.CTk):
         if not selected_clinic_full_str or selected_clinic_full_str in ["Chưa có phòng khám", "Đang tải..."]: return None
         return selected_clinic_full_str.split(" - ")[0]
 
-    def _refresh_clinic_queue_display(self): 
-        for item_row in self.examination_queue_treeview.get_children(): self.examination_queue_treeview.delete(item_row) 
-        selected_clinic_id = self._get_selected_clinic_id_for_queue_tab() 
-        if not selected_clinic_id: self.examination_queue_treeview.insert("", "end", values=("", "---", "Vui lòng chọn phòng khám", "---", "", "")); return
-        
-        display_strings_custom_list = self.medical_system_logic.get_clinic_queue_display_list(selected_clinic_id) 
-        
-        if not display_strings_custom_list.is_empty() and display_strings_custom_list.get(0).startswith(f"Hàng đợi của PK {selected_clinic_id} rỗng"):
-            self.examination_queue_treeview.insert("", "end", values=("", selected_clinic_id, display_strings_custom_list.get(0), "", "", ""))
-        elif not display_strings_custom_list.is_empty():
-            for i in range(len(display_strings_custom_list)):
-                display_str_val = display_strings_custom_list.get(i) 
-                try:
-                    parts_list = display_str_val.split(','); stt_val = parts_list[0].split('.')[0].strip(); patient_id_val = parts_list[0].split('ID:')[1].strip() 
-                    full_name_val = parts_list[1].split('Tên:')[1].strip(); priority_val = parts_list[2].split('Ưu tiên:')[1].strip() 
-                    reg_time_val = parts_list[3].split('TGĐK:')[1].strip(); absent_count_val = parts_list[4].split('Vắng:')[1].strip() 
-                    self.examination_queue_treeview.insert("", "end", values=(stt_val, patient_id_val, full_name_val, priority_val, reg_time_val, absent_count_val))
-                except Exception as e: print(f"Lỗi parse HĐ: '{display_str_val}'. Lỗi: {e}"); self.examination_queue_treeview.insert("", "end", values=("Err", "Err", display_str_val, "Err", "Err", "Err"))
-        else: self.examination_queue_treeview.insert("", "end", values=("", selected_clinic_id, "Không có dữ liệu", "", "", ""))
+    def _refresh_clinic_queue_display(self):
+        for item_row in self.examination_queue_treeview.get_children():
+            self.examination_queue_treeview.delete(item_row)
+        selected_clinic_id = self._get_selected_clinic_id_for_queue_tab()
+        if not selected_clinic_id:
+            self.examination_queue_treeview.insert("", "end", values=("", "---", "Vui lòng chọn phòng khám", "---", "", ""))
+            return
+
+        display_strings_custom_list = self.medical_system_logic.get_clinic_queue_display_list(selected_clinic_id)
+
+        if not display_strings_custom_list.is_empty():
+            first_item_str = display_strings_custom_list.get(0)
+            # Kiểm tra chính xác thông báo hàng đợi rỗng từ custom_structures.py
+            if first_item_str == "Hàng đợi rỗng.":
+                # Hiển thị thông báo cụ thể hơn trên GUI
+                self.examination_queue_treeview.insert("", "end", values=("", selected_clinic_id, f"Hàng đợi của PK {selected_clinic_id} rỗng", "", "", ""))
+            else: # Nếu không phải thông báo rỗng, thì tiến hành phân tích
+                for i in range(len(display_strings_custom_list)):
+                    display_str_val = display_strings_custom_list.get(i)
+                    try:
+                        parts_list = display_str_val.split(',')
+                        if len(parts_list) < 5: # Kiểm tra số lượng phần tử tối thiểu
+                            print(f"Lỗi parse HĐ (không đủ phần tử): '{display_str_val}'.")
+                            self.examination_queue_treeview.insert("", "end", values=("Err", "Err", display_str_val, "Err", "Err", "Err"))
+                            continue
+
+                        # Phân tích stt và patient_id một cách an toàn hơn
+                        stt_id_part = parts_list[0].split('ID:')
+                        stt_val = stt_id_part[0].split('.')[0].strip() if len(stt_id_part) > 0 else "N/A"
+                        patient_id_val = stt_id_part[1].strip() if len(stt_id_part) > 1 else "N/A"
+
+                        # Phân tích các phần còn lại một cách an toàn hơn
+                        name_part = parts_list[1].split('Tên:')
+                        full_name_val = name_part[1].strip() if len(name_part) > 1 else "N/A"
+
+                        priority_part = parts_list[2].split('Ưu tiên:')
+                        priority_val = priority_part[1].strip() if len(priority_part) > 1 else "N/A"
+
+                        reg_time_part = parts_list[3].split('TGĐK:')
+                        reg_time_val = reg_time_part[1].strip() if len(reg_time_part) > 1 else "N/A"
+
+                        absent_count_part = parts_list[4].split('Vắng:')
+                        absent_count_val = absent_count_part[1].strip() if len(absent_count_part) > 1 else "N/A"
+
+                        self.examination_queue_treeview.insert("", "end", values=(stt_val, patient_id_val, full_name_val, priority_val, reg_time_val, absent_count_val))
+                    except Exception as e:
+                        print(f"Lỗi parse HĐ: '{display_str_val}'. Lỗi: {e}")
+                        self.examination_queue_treeview.insert("", "end", values=("Err", "Err", display_str_val, "Err", "Err", "Err"))
+        else: # Trường hợp display_strings_custom_list hoàn toàn rỗng (ít khả năng xảy ra nếu logic get_display_queue_as_strings luôn trả về list có ít nhất 1 phần tử là "Hàng đợi rỗng.")
+            self.examination_queue_treeview.insert("", "end", values=("", selected_clinic_id, "Không có dữ liệu hoặc hàng đợi rỗng", "", "", ""))
 
     def _call_next_exam_patient(self): 
         if self.current_exam_patient: self._show_gui_message(f"BN {self.current_exam_patient.patient_profile.full_name} đang khám.", "WARNING"); return
