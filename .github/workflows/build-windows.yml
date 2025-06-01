@@ -1,4 +1,4 @@
-name: Build Cross-Platform Executables
+name: Build macOS Silicon Executable
 
 on:
   push:
@@ -8,93 +8,25 @@ on:
   workflow_dispatch: # Cho phép chạy thủ công từ tab Actions trên GitHub
 
 jobs:
-  # --- JOB 1: Build cho Windows (Như đã làm trước đó) ---
-  build-windows:
-    runs-on: windows-latest
+  build-macos-silicon:
+    name: Build for macOS Apple Silicon (ARM64)
+    runs-on: macos-14 # Runner này là Apple Silicon (ARM64) based, macos-latest thường cũng trỏ về đây
+
     steps:
       - name: Check out repository code
         uses: actions/checkout@v4
 
-      - name: Set up Python for Windows
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.12' # Đảm bảo phiên bản này khớp với Python bạn dùng
 
-      - name: Install Windows dependencies
+      - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install pyinstaller
-          if (Test-Path requirements.txt) { pip install -r requirements.txt } 
-
-      - name: Run PyInstaller for Windows
-        run: |
-          pyinstaller --windowed `
-                      --name "QuanLyKhamBenh" `
-                      --add-data "patients_data.csv;." `
-                      --add-data "doctors_data.csv;." `
-                      --add-data "clinics_data.csv;." `
-                      --clean `
-                      main_gui.py
-
-      - name: Upload Windows executable artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: QuanLyKhamBenh-Windows
-          path: dist/QuanLyKhamBenh # PyInstaller thường tạo một thư mục chứa file .exe
-
-  # --- JOB 2: Build cho macOS Intel (x86_64) ---
-  build-macos-intel:
-    runs-on: macos-12 # Runner này là Intel-based
-    steps:
-      - name: Check out repository code
-        uses: actions/checkout@v4
-
-      - name: Set up Python for macOS Intel
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-
-      - name: Install macOS Intel dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install pyinstaller
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-
-      - name: Run PyInstaller for macOS Intel
-        run: |
-          python -m PyInstaller --windowed \
-                      --name "QuanLyKhamBenh" \
-                      --add-data "patients_data.csv:." \
-                      --add-data "doctors_data.csv:." \
-                      --add-data "clinics_data.csv:." \
-                      --clean \
-                      --target-arch x86_64 \
-                      main_gui.py
-          # Tạo file zip cho .app để dễ dàng tải lên và tương thích với artifact
-          zip -r ./QuanLyKhamBenh-macOS-Intel.zip ./dist/QuanLyKhamBenh.app
-
-      - name: Upload macOS Intel artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: QuanLyKhamBenh-macOS-Intel-app
-          path: ./QuanLyKhamBenh-macOS-Intel.zip # Tải lên file zip của .app
-
-  # --- JOB 3: Build cho macOS Apple Silicon (ARM64) ---
-  build-macos-silicon:
-    runs-on: macos-14 # Runner này là Apple Silicon (ARM64) based
-    steps:
-      - name: Check out repository code
-        uses: actions/checkout@v4
-
-      - name: Set up Python for macOS Silicon
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-
-      - name: Install macOS Silicon dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install pyinstaller
+          # Đảm bảo file requirements.txt có trong kho chứa của bạn
+          # và chứa các thư viện như customtkinter, darkdetect, v.v.
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
       - name: Run PyInstaller for macOS Silicon
@@ -105,9 +37,11 @@ jobs:
                       --add-data "doctors_data.csv:." \
                       --add-data "clinics_data.csv:." \
                       --clean \
+                      --noconfirm \ # Đã thêm cờ này để tự động xóa thư mục output cũ
                       --target-arch arm64 \
                       main_gui.py
-          # Tạo file zip cho .app
+          # Tạo file zip cho .app để dễ dàng tải lên và tương thích với artifact
+          # Lệnh zip sẽ chạy sau khi PyInstaller hoàn tất thành công việc tạo .app
           zip -r ./QuanLyKhamBenh-macOS-Silicon.zip ./dist/QuanLyKhamBenh.app
 
       - name: Upload macOS Silicon artifact
@@ -115,44 +49,3 @@ jobs:
         with:
           name: QuanLyKhamBenh-macOS-Silicon-app
           path: ./QuanLyKhamBenh-macOS-Silicon.zip # Tải lên file zip của .app
-
-  # --- JOB 4: Build cho Linux (x86_64) ---
-  build-linux:
-    runs-on: ubuntu-latest # Runner này là x86_64 Linux
-    steps:
-      - name: Check out repository code
-        uses: actions/checkout@v4
-
-      - name: Set up Python for Linux
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-
-      - name: Install Linux system dependencies (for Tkinter/GUI)
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y python3-tk # Cần cho Tkinter
-          # Nếu customtkinter cần các thư viện hệ thống khác, thêm vào đây
-
-      - name: Install Python dependencies for Linux
-        run: |
-          python -m pip install --upgrade pip
-          pip install pyinstaller
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-
-      - name: Run PyInstaller for Linux
-        run: |
-          python -m PyInstaller --windowed \
-                      --name "QuanLyKhamBenh" \
-                      --add-data "patients_data.csv:." \
-                      --add-data "doctors_data.csv:." \
-                      --add-data "clinics_data.csv:." \
-                      --clean \
-                      main_gui.py 
-          # PyInstaller trên Linux với --windowed thường tạo một thư mục chứa file thực thi
-
-      - name: Upload Linux artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: QuanLyKhamBenh-Linux
-          path: dist/QuanLyKhamBenh # Tải lên thư mục chứa bản build Linux
