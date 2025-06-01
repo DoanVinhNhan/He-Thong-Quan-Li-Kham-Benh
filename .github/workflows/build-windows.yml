@@ -1,45 +1,46 @@
-name: Build Windows Executable # Tên của workflow, bạn có thể đặt tùy ý
+name: Build Windows Executable
 
-on: # Các sự kiện kích hoạt workflow
-  push: # Chạy mỗi khi có push lên bất kỳ branch nào
+on:
+  push:
     branches:
-      - main # Hoặc master, hoặc branch chính của bạn
-      - develop # Ví dụ
+      - main # Hoặc branch chính của bạn
+      # - develop # Bạn có thể thêm các branch khác nếu muốn
   workflow_dispatch: # Cho phép chạy thủ công từ tab Actions trên GitHub
 
 jobs:
   build-windows:
-    runs-on: windows-latest # Chỉ định chạy trên máy ảo Windows mới nhất
+    runs-on: windows-latest # Chạy trên máy ảo Windows mới nhất
 
     steps:
       - name: Check out repository code # Bước 1: Lấy code từ kho chứa
-        uses: actions/checkout@v4 # Sử dụng một action có sẵn của GitHub
+        uses: actions/checkout@v4
 
       - name: Set up Python # Bước 2: Cài đặt Python
-        uses: actions/setup-python@v5 # Sử dụng action cài Python
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.12' # Chọn phiên bản Python bạn dùng (ví dụ 3.12)
+          python-version: '3.12' # Đảm bảo phiên bản này khớp với Python bạn dùng
 
       - name: Install dependencies # Bước 3: Cài đặt các thư viện
         run: |
           python -m pip install --upgrade pip
           pip install pyinstaller
           # Đảm bảo file requirements.txt có trong kho chứa của bạn
+          # và chứa các thư viện như customtkinter, darkdetect, v.v.
           if (Test-Path requirements.txt) { pip install -r requirements.txt } 
 
       - name: Run PyInstaller to build executable # Bước 4: Chạy PyInstaller
         run: |
-          pyinstaller --windowed ^
-                      --name "QuanLyKhamBenh" ^
-                      --add-data "patients_data.csv;." ^
-                      --add-data "doctors_data.csv;." ^
-                      --add-data "clinics_data.csv;." ^
-                      --clean ^
+          pyinstaller --windowed `
+                      --name "QuanLyKhamBenh" `
+                      --add-data "patients_data.csv;." `
+                      --add-data "doctors_data.csv;." `
+                      --add-data "clinics_data.csv;." `
+                      --clean `
                       main_gui.py
-        # Lưu ý: 
-        # - Dùng dấu ^ để xuống dòng trong PowerShell/CMD của Windows.
+        # Ghi chú:
+        # - Dùng dấu ` (backtick) để xuống dòng trong PowerShell.
         # - Dùng dấu ; làm phân cách trong --add-data trên Windows.
-        # - Đảm bảo các file data (patients_data.csv,...) nằm ở thư mục gốc của kho chứa
+        # - Đảm bảo các file data (patients_data.csv, etc.) nằm ở thư mục gốc của kho chứa
         #   hoặc bạn cần điều chỉnh đường dẫn tương đối cho đúng.
 
       - name: Upload Windows executable artifact # Bước 5: Tải lên file đã build
@@ -47,5 +48,5 @@ jobs:
         with:
           name: QuanLyKhamBenh-Windows-exe # Tên của artifact bạn sẽ thấy để tải về
           path: dist/QuanLyKhamBenh # Đường dẫn đến thư mục chứa file .exe và các file liên quan
-                                    # PyInstaller với --windowed thường tạo ra một thư mục trong 'dist'
+                                    # PyInstaller với --windowed thường tạo một thư mục trong 'dist'.
                                     # Nếu bạn dùng --onefile, đường dẫn sẽ là dist/QuanLyKhamBenh.exe
