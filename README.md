@@ -17,7 +17,7 @@ Dữ liệu được lưu trữ trong các tệp CSV: `patients_data.csv`, `doct
 ## 2. Hướng dẫn sử dụng nhanh (Cho người dùng cuối - Phiên bản đóng gói sẵn)
 Đây là cách dễ nhất để chạy ứng dụng mà không cần cài đặt Python hay các thư viện.
 1.  **Tải toàn bộ dự án**:
-    * Tìm đến mục **"Releases"**, Phiên bản 1.3 - Ứng dụng Quản lý Khám Bệnh **"latest"**
+    * Tìm đến mục **"Releases"** ở góc phải màn hình, chọn Phiên bản 1.3 - Ứng dụng Quản lý Khám Bệnh **"latest"**
     * Chọn **"Download Source code (Zip)"**.
     * Lưu tệp ZIP này vào máy tính của bạn.
 
