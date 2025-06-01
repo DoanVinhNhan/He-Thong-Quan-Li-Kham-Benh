@@ -14,11 +14,32 @@ Chương trình mô phỏng hệ thống quản lý hoạt động khám bệnh 
 Dữ liệu được lưu trữ trong các tệp CSV: `patients_data.csv`, `doctors_data.csv`, `clinics_data.csv`.
 Định dạng ngày tháng sử dụng trong hệ thống và tệp CSV là `DD/MM/YY`.
 
-## 2. Yêu cầu về môi trường
+## 2. Hướng dẫn sử dụng nhanh (Cho người dùng cuối - Phiên bản đóng gói sẵn)
+Đây là cách dễ nhất để chạy ứng dụng mà không cần cài đặt Python hay các thư viện.
+1.  **Tải toàn bộ dự án**:
+    * Nhấn vào nút màu xanh lá cây có chữ **"< > Code"**.
+    * Chọn **"Download ZIP"**.
+    * Lưu tệp ZIP này vào máy tính của bạn.
+
+2.  **Giải nén**:
+    * Tìm tệp ZIP bạn vừa tải về (ví dụ: `He-Thong-Quan-Li-Kham-Benh-main.zip`).
+    * Giải nén tệp ZIP này ra một thư mục. Bạn sẽ có một thư mục ví dụ như `He-Thong-Quan-Li-Kham-Benh-main`.
+
+3.  **Chạy ứng dụng**:
+    * Đi vào thư mục bạn vừa giải nén, sau đó vào thư mục con `dist`.
+    * **Trên Windows**:
+        * Tìm và nháy đúp chuột vào tệp `QuanLyKhamBenh.exe`.
+    * **Trên macOS**:
+        * Tìm và nháy đúp chuột vào tệp ứng dụng`QuanLyKhamBenh` .
+        * Lần đầu tiên chạy, bạn có thể cần:
+            * Click chuột phải vào ứng dụng và chọn "Open".
+            * Sau đó, trong hộp thoại cảnh báo, chọn "Open" một lần nữa.
+            * (Nếu bạn đã kéo ứng dụng vào thư mục "Applications", hãy chạy từ đó).
+
+## 3. Hướng dẫn cài đặt và chạy chương trình (Cho nhà phát triển)
 * Python 3.9+
 * Các thư viện được liệt kê trong `requirements.txt` (chủ yếu là `customtkinter`).
 
-## 3. Hướng dẫn cài đặt và chạy chương trình
 
 **QUAN TRỌNG**: Để đảm bảo ứng dụng GUI (sử dụng CustomTkinter) hoạt động ổn định, việc thiết lập môi trường Python với phiên bản Tcl/Tk tương thích là rất cần thiết, đặc biệt trên macOS.
 
@@ -125,6 +146,3 @@ Do phiên bản Tcl/Tk đi kèm với Python hệ thống trên macOS thường 
 * Đặng Thị Thuỳ Dương - 20237318
 * Nguyễn Thị Huệ     - 20237439
 * Đoàn Vĩnh Nhân     - 20237376
-
-**Lưu ý quan trọng:**
-Theo yêu cầu của đồ án, tất cả các cấu trúc dữ liệu cốt lõi (Bảng Băm, Hàng Đợi Ưu Tiên/Heap, Danh Sách Liên Kết, Cây Radix) được nhóm tự xây dựng và cài đặt, không sử dụng các thư viện hay cấu trúc có sẵn của Python cho các thành phần này (ví dụ: không dùng `dict` cho bảng băm, `list` cho danh sách liên kết, module `heapq` cho heap/hàng đợi ưu tiên). Module `csv` của Python được sử dụng cho tiện ích đọc/ghi file định dạng CSV.
