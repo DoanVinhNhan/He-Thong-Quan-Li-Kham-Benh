@@ -775,48 +775,48 @@ class MedicalAppGUI(ctk.CTk):
         self._refresh_full_examination_history_list(show_count_message=True)
 
     def _refresh_full_examination_history_list(self, show_count_message=False): # Thêm tham số show_count_message
-    for item_row in self.full_examination_history_treeview.get_children(): self.full_examination_history_treeview.delete(item_row)
-    from_date_str_val = self.from_date_filter_entry.get().strip()
-    to_date_str_val = self.to_date_filter_entry.get().strip()
-    doctor_id_val = self.doctor_id_filter_entry.get().strip().upper()
-    clinic_id_val = self.clinic_filter_entry.get().strip().upper()
-
-    history_custom_list, message_text, message_lvl = self.medical_system_logic.filter_examination_history(
-        from_date_str=from_date_str_val if from_date_str_val else None,
-        to_date_str=to_date_str_val if to_date_str_val else None,
-        doctor_id_filter=doctor_id_val if doctor_id_val else None,
-        clinic_id_filter=clinic_id_val if clinic_id_val else None
-    )
-
-    if message_lvl == "ERROR":
-        self._show_gui_message(message_text, message_lvl)
-        self.full_examination_history_treeview.insert("", "end", values=("", "", message_text, "", "", "", "", "", "")) # Cập nhật số lượng cột trống
-        return
-
-    if history_custom_list.is_empty():
-         if show_count_message: # Chỉ hiển thị nếu được yêu cầu
-            self._show_gui_message(message_text if message_text else "Không có lịch sử khám nào.", "INFO")
-         self.full_examination_history_treeview.insert("", "end", values=("", "", message_text if message_text else "Không có lịch sử khám.", "", "", "", "", "", "")) # Cập nhật
-    else:
-        for i in range(len(history_custom_list)):
-            history_record = history_custom_list.get(i)
-            exam_date_display = history_record.get('ngay_kham')
-            if isinstance(exam_date_display, datetime.date):
-                exam_date_display = exam_date_display.strftime(DATE_FORMAT_CSV)
-
-            self.full_examination_history_treeview.insert("", "end", values=(
-                i + 1,
-                history_record.get('ma_bn', 'N/A'),
-                history_record.get('ho_ten_bn', 'N/A'),
-                exam_date_display or 'N/A',
-                history_record.get('loai_kham', 'N/A'),
-                history_record.get('ket_qua', 'N/A'),
-                history_record.get('ghi_chu', 'N/A'),
-                history_record.get('ma_bac_si_kham', 'N/A'),
-                history_record.get('ma_phong_kham_kham', 'N/A')
-            ))
-        if show_count_message and message_text and message_lvl == "INFO" and len(history_custom_list) > 0 : # Chỉ hiển thị nếu được yêu cầu
+        for item_row in self.full_examination_history_treeview.get_children(): self.full_examination_history_treeview.delete(item_row)
+        from_date_str_val = self.from_date_filter_entry.get().strip()
+        to_date_str_val = self.to_date_filter_entry.get().strip()
+        doctor_id_val = self.doctor_id_filter_entry.get().strip().upper()
+        clinic_id_val = self.clinic_filter_entry.get().strip().upper()
+    
+        history_custom_list, message_text, message_lvl = self.medical_system_logic.filter_examination_history(
+            from_date_str=from_date_str_val if from_date_str_val else None,
+            to_date_str=to_date_str_val if to_date_str_val else None,
+            doctor_id_filter=doctor_id_val if doctor_id_val else None,
+            clinic_id_filter=clinic_id_val if clinic_id_val else None
+        )
+    
+        if message_lvl == "ERROR":
             self._show_gui_message(message_text, message_lvl)
+            self.full_examination_history_treeview.insert("", "end", values=("", "", message_text, "", "", "", "", "", "")) # Cập nhật số lượng cột trống
+            return
+    
+        if history_custom_list.is_empty():
+             if show_count_message: # Chỉ hiển thị nếu được yêu cầu
+                self._show_gui_message(message_text if message_text else "Không có lịch sử khám nào.", "INFO")
+             self.full_examination_history_treeview.insert("", "end", values=("", "", message_text if message_text else "Không có lịch sử khám.", "", "", "", "", "", "")) # Cập nhật
+        else:
+            for i in range(len(history_custom_list)):
+                history_record = history_custom_list.get(i)
+                exam_date_display = history_record.get('ngay_kham')
+                if isinstance(exam_date_display, datetime.date):
+                    exam_date_display = exam_date_display.strftime(DATE_FORMAT_CSV)
+    
+                self.full_examination_history_treeview.insert("", "end", values=(
+                    i + 1,
+                    history_record.get('ma_bn', 'N/A'),
+                    history_record.get('ho_ten_bn', 'N/A'),
+                    exam_date_display or 'N/A',
+                    history_record.get('loai_kham', 'N/A'),
+                    history_record.get('ket_qua', 'N/A'),
+                    history_record.get('ghi_chu', 'N/A'),
+                    history_record.get('ma_bac_si_kham', 'N/A'),
+                    history_record.get('ma_phong_kham_kham', 'N/A')
+                ))
+            if show_count_message and message_text and message_lvl == "INFO" and len(history_custom_list) > 0 : # Chỉ hiển thị nếu được yêu cầu
+                self._show_gui_message(message_text, message_lvl)
             
     def _refresh_all_application_lists(self): 
         self._display_all_patients_in_search_tab() 
