@@ -739,7 +739,7 @@ class MedicalAppGUI(ctk.CTk):
         ctk.CTkLabel(filter_controls_frame, text="Mã PK (chứa):").grid(row=1, column=2, padx=5, pady=5, sticky="w")
         self.clinic_filter_entry = ctk.CTkEntry(filter_controls_frame, placeholder_text="Ví dụ: PK001", width=150); self.clinic_filter_entry.grid(row=1, column=3, padx=5, pady=5) 
         filter_action_buttons_frame = ctk.CTkFrame(filter_controls_frame); filter_action_buttons_frame.grid(row=0, column=4, rowspan=2, padx=20, pady=5, sticky="ns") 
-        ctk.CTkButton(filter_action_buttons_frame, text="Lọc Lịch sử", command=self._refresh_full_examination_history_list).pack(pady=5) 
+        ctk.CTkButton(filter_action_buttons_frame, text="Lọc Lịch sử", command=lambda: self._refresh_full_examination_history_list(show_count_message=True)).pack(pady=5)
         ctk.CTkButton(filter_action_buttons_frame, text="Xóa bộ lọc", command=self._clear_examination_history_filters).pack(pady=5) 
         history_treeview_frame = ctk.CTkFrame(history_tab_main_frame); history_treeview_frame.pack(expand=True, fill="both", padx=10, pady=5) 
         
@@ -772,7 +772,7 @@ class MedicalAppGUI(ctk.CTk):
     def _clear_examination_history_filters(self): 
         self.from_date_filter_entry.delete(0, "end"); self.to_date_filter_entry.delete(0, "end")
         self.doctor_id_filter_entry.delete(0, "end"); self.clinic_filter_entry.delete(0, "end")
-        self._refresh_full_examination_history_list()
+        self._refresh_full_examination_history_list(show_count_message=True)
 
     def _refresh_full_examination_history_list(self, show_count_message=False): # Thêm tham số show_count_message
     for item_row in self.full_examination_history_treeview.get_children(): self.full_examination_history_treeview.delete(item_row)
