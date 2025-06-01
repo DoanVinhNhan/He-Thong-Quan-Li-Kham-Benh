@@ -1,16 +1,53 @@
-name: Build macOS Intel Executable
+name: Build Cross-Platform Executables
 
 on:
   push:
     branches:
-      - main
-  workflow_dispatch:
+      - main # Kích hoạt khi có push lên branch 'main' (hoặc 'master')
+      # - develop # Bạn có thể thêm các branch khác nếu muốn
+  workflow_dispatch: # Cho phép chạy workflow này thủ công từ tab "Actions" trên GitHub
 
 jobs:
+  # --- JOB 1: Build cho Windows ---
+  build-windows:
+    name: Build for Windows
+    runs-on: windows-latest
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+
+      - name: Set up Python for Windows
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Windows dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyinstaller
+          if (Test-Path requirements.txt) { pip install -r requirements.txt } 
+
+      - name: Run PyInstaller for Windows
+        run: |
+          pyinstaller --windowed `
+                      --name "QuanLyKhamBenh" `
+                      --add-data "patients_data.csv;." `
+                      --add-data "doctors_data.csv;." `
+                      --add-data "clinics_data.csv;." `
+                      --clean `
+                      --noconfirm `
+                      main_gui.py
+
+      - name: Upload Windows executable artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: QuanLyKhamBenh-Windows
+          path: dist/QuanLyKhamBenh # PyInstaller thường tạo một thư mục chứa file .exe
+
+  # --- JOB 2: Build cho macOS Intel (x86_64) ---
   build-macos-intel:
     name: Build for macOS Intel (x86_64)
-    runs-on: macos-latest # Sẽ là ARM64, Python x86_64 chạy qua Rosetta 2
-
+    runs-on: macos-latest # Sử dụng runner ARM64, Python x86_64 sẽ chạy qua Rosetta 2
     steps:
       - name: Check out repository code
         uses: actions/checkout@v4
@@ -18,18 +55,14 @@ jobs:
       - name: Set up Python for x86_64 on macOS
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12.10' # Chỉ định phiên bản vá lỗi cụ thể
-          architecture: 'x86_64'   # Yêu cầu kiến trúc x86_64
+          python-version: '3.12'
+          architecture: 'x86_64' # Yêu cầu cài đặt Python kiến trúc x86_64
 
-      - name: Install dependencies
+      - name: Install macOS Intel dependencies
         run: |
           python -m pip install --upgrade pip
           pip install pyinstaller
-          if [ -f requirements.txt ]; then 
-            pip install -r requirements.txt
-          else
-            echo "requirements.txt not found, skipping."
-          fi
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
       - name: Run PyInstaller for macOS Intel
         run: |
@@ -42,7 +75,6 @@ jobs:
                       --noconfirm \
                       --target-arch x86_64 \
                       main_gui.py
-          
           echo "PyInstaller build for Intel macOS completed. Zipping the .app bundle..."
           zip -r ./QuanLyKhamBenh-macOS-Intel.zip ./dist/QuanLyKhamBenh.app
 
@@ -51,3 +83,86 @@ jobs:
         with:
           name: QuanLyKhamBenh-macOS-Intel-app
           path: ./QuanLyKhamBenh-macOS-Intel.zip
+
+  # --- JOB 3: Build cho macOS Apple Silicon (ARM64) ---
+  build-macos-silicon:
+    name: Build for macOS Apple Silicon (ARM64)
+    runs-on: macos-latest # macos-latest hoặc macos-14 là ARM64
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+
+      - name: Set up Python for macOS Silicon
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          # Không cần chỉ định architecture, mặc định sẽ là ARM64 trên runner ARM64
+
+      - name: Install macOS Silicon dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyinstaller
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      - name: Run PyInstaller for macOS Silicon
+        run: |
+          python -m PyInstaller --windowed \
+                      --name "QuanLyKhamBenh" \
+                      --add-data "patients_data.csv:." \
+                      --add-data "doctors_data.csv:." \
+                      --add-data "clinics_data.csv:." \
+                      --clean \
+                      --noconfirm \
+                      --target-arch arm64 \
+                      main_gui.py
+          echo "PyInstaller build for Apple Silicon macOS completed. Zipping the .app bundle..."
+          zip -r ./QuanLyKhamBenh-macOS-Silicon.zip ./dist/QuanLyKhamBenh.app
+
+      - name: Upload macOS Silicon artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: QuanLyKhamBenh-macOS-Silicon-app
+          path: ./QuanLyKhamBenh-macOS-Silicon.zip
+
+  # --- JOB 4: Build cho Linux (x86_64) ---
+  build-linux:
+    name: Build for Linux (x86_64)
+    runs-on: ubuntu-latest # Runner này là x86_64 Linux
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+
+      - name: Set up Python for Linux
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Linux system dependencies (for Tkinter/GUI)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-tk # Cần cho Tkinter (customtkinter dựa trên nó)
+          # Nếu customtkinter của bạn cần các thư viện hệ thống Linux khác, hãy thêm vào đây
+
+      - name: Install Python dependencies for Linux
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyinstaller
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      - name: Run PyInstaller for Linux
+        run: |
+          python -m PyInstaller --windowed \
+                      --name "QuanLyKhamBenh" \
+                      --add-data "patients_data.csv:." \
+                      --add-data "doctors_data.csv:." \
+                      --add-data "clinics_data.csv:." \
+                      --clean \
+                      --noconfirm \
+                      main_gui.py 
+                      # Không cần --target-arch vì ubuntu-latest là x86_64 và PyInstaller sẽ build mặc định
+
+      - name: Upload Linux artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: QuanLyKhamBenh-Linux
+          path: dist/QuanLyKhamBenh # Tải lên thư mục chứa bản build Linux
