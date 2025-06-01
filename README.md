@@ -24,7 +24,7 @@ Dữ liệu của hệ thống được lưu trữ trong các tệp CSV: `patien
     * Truy cập trang GitHub của dự án.
     * Tìm đến mục **"Releases"** (thường nằm ở thanh bên phải hoặc trong menu chính của kho chứa).
     * Chọn phiên bản mới nhất (ví dụ: **Phiên bản 1.3 - Ứng dụng Quản lý Khám Bệnh "latest"**).
-    * Trong mục "Assets" của release đó, tải về tệp **ZIP** phù hợp với hệ điều hành của bạn (ví dụ: `QuanLyKhamBenh-Windows.zip`, `QuanLyKhamBenh-macOS-Intel.zip`, `QuanLyKhamBenh-macOS-Silicon.zip`).
+    * Trong mục "Assets" của release đó, tải về tệp **ZIP** phù hợp với hệ điều hành của bạn (ví dụ: `QuanLyKhamBenh-Windows.zip`, `QuanLyKhamBenh-macOS-Intel.zip`, `QuanLyKhamBenh-macOS-Silicon.zip`, `QuanLyKhamBenh-Linux.zip`).
     * Lưu tệp ZIP này vào máy tính.
 
 2.  **Giải nén tệp ZIP**:
@@ -41,7 +41,8 @@ Dữ liệu của hệ thống được lưu trữ trong các tệp CSV: `patien
             2.  Chọn **"Open"** từ menu ngữ cảnh.
             3.  Một hộp thoại cảnh báo có thể xuất hiện. Hãy nhấp vào nút **"Open"** một lần nữa để xác nhận.
             * (Nếu bạn đã kéo ứng dụng vào thư mục "Applications", hãy chạy từ đó).
-    * **Lưu ý chung**: Thời gian khởi động ứng dụng lần đầu có thể hơi chậm một chút.
+    * **Trên Linux**:
+        * Tìm và nháy đúp chuột vào tệp ứng dụng `QuanLyKhamBenh`.
 
 ## 3. Hướng dẫn cài đặt và chạy chương trình (Cho nhà phát triển)
 
