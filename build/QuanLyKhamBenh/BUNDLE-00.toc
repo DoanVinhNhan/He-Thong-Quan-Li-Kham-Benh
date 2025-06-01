@@ -1,3 +1,0 @@
-([('QuanLyKhamBenh',
-   '/Users/doanvinhnhan/Downloads/He-Thong-Quan-Li-Kham-Benh-main/dist/QuanLyKhamBenh',
-   'EXECUTABLE')],)
