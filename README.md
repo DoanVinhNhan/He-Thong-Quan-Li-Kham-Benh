@@ -35,7 +35,7 @@ Dữ liệu được lưu trữ trong các tệp CSV: `patients_data.csv`, `doct
             * Click chuột phải vào ứng dụng và chọn "Open".
             * Sau đó, trong hộp thoại cảnh báo, chọn "Open" một lần nữa.
             * (Nếu bạn đã kéo ứng dụng vào thư mục "Applications", hãy chạy từ đó).
-
+   * (Lưu ý: Thời gian khởi động app có thể hơi chậm)
 ## 3. Hướng dẫn cài đặt và chạy chương trình (Cho nhà phát triển)
 * Python 3.9+
 * Các thư viện được liệt kê trong `requirements.txt` (chủ yếu là `customtkinter`).
