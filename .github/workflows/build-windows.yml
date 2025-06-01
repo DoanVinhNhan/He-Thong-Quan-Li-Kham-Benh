@@ -3,33 +3,41 @@ name: Build macOS Silicon Executable
 on:
   push:
     branches:
-      - main # Hoặc branch chính của bạn
-      # - develop # Bạn có thể thêm các branch khác nếu muốn
-  workflow_dispatch: # Cho phép chạy thủ công từ tab Actions trên GitHub
+      - main # Hoặc branch chính của bạn (ví dụ: master)
+      # - develop # Bạn có thể thêm các branch khác nếu muốn kích hoạt build từ đó
+  workflow_dispatch: # Cho phép bạn chạy workflow này thủ công từ tab "Actions" trên GitHub
 
 jobs:
   build-macos-silicon:
     name: Build for macOS Apple Silicon (ARM64)
-    runs-on: macos-14 # Runner này là Apple Silicon (ARM64) based, macos-latest thường cũng trỏ về đây
+    runs-on: macos-14 # Sử dụng runner macOS mới nhất (ARM64 Apple Silicon based)
 
     steps:
       - name: Check out repository code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4 # Action để lấy mã nguồn từ kho chứa của bạn
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v5 # Action để cài đặt phiên bản Python mong muốn
         with:
-          python-version: '3.12' # Đảm bảo phiên bản này khớp với Python bạn dùng
+          python-version: '3.12' # Đảm bảo phiên bản này khớp với Python bạn dùng cho dự án
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install pyinstaller
-          # Đảm bảo file requirements.txt có trong kho chứa của bạn
+          # Kiểm tra xem file requirements.txt có tồn tại không trước khi cài đặt
+          # Đảm bảo file requirements.txt này có trong kho chứa của bạn
           # và chứa các thư viện như customtkinter, darkdetect, v.v.
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          if [ -f requirements.txt ]; then 
+            pip install -r requirements.txt
+          else
+            echo "requirements.txt not found, skipping."
+          fi
 
       - name: Run PyInstaller for macOS Silicon
+        # Chạy PyInstaller để build ứng dụng.
+        # Các tùy chọn được xuống dòng bằng dấu \ cho dễ đọc.
+        # main_gui.py là file script chính của bạn.
         run: |
           python -m PyInstaller --windowed \
                       --name "QuanLyKhamBenh" \
@@ -37,15 +45,17 @@ jobs:
                       --add-data "doctors_data.csv:." \
                       --add-data "clinics_data.csv:." \
                       --clean \
-                      --noconfirm \ # Đã thêm cờ này để tự động xóa thư mục output cũ
+                      --noconfirm \
                       --target-arch arm64 \
                       main_gui.py
-          # Tạo file zip cho .app để dễ dàng tải lên và tương thích với artifact
-          # Lệnh zip sẽ chạy sau khi PyInstaller hoàn tất thành công việc tạo .app
+          
+          echo "PyInstaller build completed. Zipping the .app bundle..."
+          # Tạo file zip cho .app bundle để dễ dàng tải lên làm artifact
+          # Lệnh zip này sẽ chạy sau khi PyInstaller hoàn tất thành công việc tạo .app
           zip -r ./QuanLyKhamBenh-macOS-Silicon.zip ./dist/QuanLyKhamBenh.app
 
       - name: Upload macOS Silicon artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v4 # Action để tải lên artifact
         with:
-          name: QuanLyKhamBenh-macOS-Silicon-app
-          path: ./QuanLyKhamBenh-macOS-Silicon.zip # Tải lên file zip của .app
+          name: QuanLyKhamBenh-macOS-Silicon-app # Tên của artifact bạn sẽ thấy để tải về
+          path: ./QuanLyKhamBenh-macOS-Silicon.zip # Đường dẫn đến file zip chứa .app bundle
