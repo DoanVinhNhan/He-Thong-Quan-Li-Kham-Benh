@@ -12,7 +12,7 @@ Chương trình mô phỏng hệ thống quản lý hoạt động khám bệnh 
 * **Hoàn thành Khám và Lịch sử**: Ghi nhận kết quả khám vào lịch sử bệnh nhân.
 
 Dữ liệu được lưu trữ trong các tệp CSV: `patients_data.csv`, `doctors_data.csv`, `clinics_data.csv`.
-Định dạng ngày tháng sử dụng trong hệ thống và tệp CSV là `DD/MM/YY`.
+Định dạng ngày tháng sử dụng trong hệ thống và tệp CSV là `YYYY/MM/DD`.
 
 ## 2. Hướng dẫn sử dụng nhanh (Cho người dùng cuối - Phiên bản đóng gói sẵn)
 Đây là cách dễ nhất để chạy ứng dụng mà không cần cài đặt Python hay các thư viện.
