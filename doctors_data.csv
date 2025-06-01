@@ -1,0 +1,11 @@
+ma_bac_si,ho_ten_bac_si,chuyen_khoa,danh_sach_ma_phong_kham
+BS001,Trần Văn Minh,Nội tổng quát,"PK001,PK003"
+BS002,Lê Thị Hoa,Nhi khoa,"PK001,PK002"
+BS003,Phạm Anh Dũng,Ngoại khoa,"PK001,PK004"
+BS004,Nguyễn Thu Lan,Tai mũi họng,PK002
+BS005,Hoàng Tiến Sĩ,Da liễu,PK004
+BS006,Vũ Kim Chi,Sản phụ khoa,PK005
+BS007,Đinh Quang Huy,Mắt,PK003
+BS008,Mai Phương Thúy,Tim mạch,PK001
+BS009,Lý Hùng Cường,Chẩn đoán hình ảnh,"PK001,PK003"
+BS010,Nguyễn An Bình,Y học cổ truyền,""
