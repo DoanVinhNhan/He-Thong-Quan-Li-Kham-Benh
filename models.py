@@ -149,7 +149,6 @@ class Patient:
 class PatientInQueue: 
     PRIORITY_MAP = { 'Tái khám': 1, 'Thông thường': 2, 'Ưu tiên': 3, 'Ưu tiên cao': 4, 'Cấp cứu': 5}
     PRIORITY_DISPLAY_MAP = {v: k for k, v in PRIORITY_MAP.items() if k in ['Tái khám', 'Thông thường', 'Ưu tiên cao', 'Cấp cứu', 'Ưu tiên thấp']}
-    if 3 not in PRIORITY_DISPLAY_MAP or PRIORITY_DISPLAY_MAP[3] not in ['Ưu tiên thấp', 'Ưu tiên']: PRIORITY_DISPLAY_MAP[3] = 'Ưu tiên thấp'
 
     def __init__(self, patient_profile_obj, priority_str_val, registration_timestamp=None): 
         self.patient_profile = patient_profile_obj; self.patient_id = patient_profile_obj.patient_id 
