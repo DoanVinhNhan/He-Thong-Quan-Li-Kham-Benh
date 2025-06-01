@@ -3,15 +3,13 @@ name: Build macOS Intel Executable
 on:
   push:
     branches:
-      - main # Kích hoạt khi có push lên branch 'main' (hoặc 'master')
-      # - develop # Bạn có thể thêm các branch khác nếu muốn
-  workflow_dispatch: # Cho phép chạy workflow này thủ công từ tab "Actions" trên GitHub
+      - main
+  workflow_dispatch:
 
 jobs:
   build-macos-intel:
     name: Build for macOS Intel (x86_64)
-    # Sử dụng runner macOS mới nhất (thường là ARM64), Python x86_64 sẽ chạy qua Rosetta 2
-    runs-on: macos-latest 
+    runs-on: macos-latest # Sẽ là ARM64, Python x86_64 chạy qua Rosetta 2
 
     steps:
       - name: Check out repository code
@@ -20,16 +18,13 @@ jobs:
       - name: Set up Python for x86_64 on macOS
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12' # Đảm bảo phiên bản này khớp với Python bạn dùng
-          architecture: 'x86_64' # Quan trọng: Yêu cầu cài đặt Python kiến trúc x86_64
+          python-version: '3.12.10' # Chỉ định phiên bản vá lỗi cụ thể
+          architecture: 'x86_64'   # Yêu cầu kiến trúc x86_64
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install pyinstaller
-          # Kiểm tra xem file requirements.txt có tồn tại không trước khi cài đặt
-          # Đảm bảo file requirements.txt này có trong kho chứa của bạn
-          # và chứa các thư viện như customtkinter, darkdetect, v.v.
           if [ -f requirements.txt ]; then 
             pip install -r requirements.txt
           else
@@ -37,8 +32,6 @@ jobs:
           fi
 
       - name: Run PyInstaller for macOS Intel
-        # Chạy PyInstaller để build ứng dụng.
-        # Python đang chạy ở đây là x86_64 (do actions/setup-python với architecture: 'x86_64')
         run: |
           python -m PyInstaller --windowed \
                       --name "QuanLyKhamBenh" \
@@ -51,11 +44,10 @@ jobs:
                       main_gui.py
           
           echo "PyInstaller build for Intel macOS completed. Zipping the .app bundle..."
-          # Tạo file zip cho .app bundle để dễ dàng tải lên làm artifact
           zip -r ./QuanLyKhamBenh-macOS-Intel.zip ./dist/QuanLyKhamBenh.app
 
       - name: Upload macOS Intel artifact
         uses: actions/upload-artifact@v4
         with:
           name: QuanLyKhamBenh-macOS-Intel-app
-          path: ./QuanLyKhamBenh-macOS-Intel.zip # Tải lên file zip của .app
+          path: ./QuanLyKhamBenh-macOS-Intel.zip
