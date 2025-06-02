@@ -229,6 +229,7 @@ class MaxHeap:
             return True
         return False 
 
+# --- Cấu trúc PriorityQueue ---
 class CustomPriorityQueue: 
     def __init__(self): self.internal_heap = MaxHeap() 
     @property
