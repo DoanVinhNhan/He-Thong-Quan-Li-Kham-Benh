@@ -33,12 +33,11 @@ Chương trình mô phỏng hệ thống quản lý hoạt động khám bệnh 
 Dữ liệu của hệ thống được lưu trữ trong các tệp CSV: `patients_data.csv`, `doctors_data.csv`, `clinics_data.csv`.
 Định dạng ngày tháng được sử dụng trong toàn bộ hệ thống và các tệp CSV là `YYYY/MM/DD`.
 
-## 4. Hướng dẫn sử dụng nhanh (Cho người dùng cuối - Phiên bản đóng gói sẵn)
+## 4. Hướng dẫn sử dụng nhanh (Cho người dùng cuối - Phiên bản đóng gói sẵn, không cần cài đặt thư viện)
 
 Đây là cách đơn giản nhất để trải nghiệm ứng dụng mà không cần cài đặt Python hay bất kỳ thư viện phức tạp nào.
 
 1.  **Tải file .zip ở Release**:
-    * Truy cập trang GitHub của dự án.
     * Tìm đến mục **"Releases"** (thường nằm ở thanh bên phải hoặc trong menu chính của kho chứa).
     * Chọn phiên bản mới nhất (ví dụ: **Phiên bản 1.3 - Ứng dụng Quản lý Khám Bệnh "latest"**).
     * Trong mục "Assets" của release đó, tải về tệp **ZIP** phù hợp với hệ điều hành của bạn (ví dụ: `QuanLyKhamBenh-Windows.zip`, `QuanLyKhamBenh-macOS-Intel.zip`, `QuanLyKhamBenh-macOS-Silicon.zip`, `QuanLyKhamBenh-Linux.zip`).
