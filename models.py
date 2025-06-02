@@ -1,6 +1,6 @@
 # models.py
 import datetime
-from custom_structures import LinkedList, List # Giả sử custom_structures chứa các cấu trúc dữ liệu này
+from custom_structures import LinkedList, List 
 
 DATE_FORMAT_CSV = "%Y-%m-%d"
 DATETIME_FORMAT_DISPLAY = "%Y-%m-%d %H:%M:%S"
@@ -22,13 +22,11 @@ class Doctor:
 
     def to_csv_row(self):
         clinic_str_list_py = []
-        # Cần một vòng lặp để lấy các phần tử từ self.clinic_id_list
-        # Ví dụ: for i in range(len(self.clinic_id_list)): clinic_str_list_py.append(self.clinic_id_list.get(i))
         return {
             "ma_bac_si": self.doctor_id,
             "ho_ten_bac_si": self.doctor_name,
             "chuyen_khoa": self.specialty,
-            "danh_sach_ma_phong_kham": LIST_ID_SEPARATOR.join(clinic_str_list_py) # Cần sửa lại logic này
+            "danh_sach_ma_phong_kham": LIST_ID_SEPARATOR.join(clinic_str_list_py)
         }
 
     @classmethod
@@ -57,13 +55,11 @@ class Clinic:
 
     def to_csv_row(self):
         doctor_str_list_py = []
-        # Cần một vòng lặp để lấy các phần tử từ self.doctor_id_list
-        # Ví dụ: for i in range(len(self.doctor_id_list)): doctor_str_list_py.append(self.doctor_id_list.get(i))
         return {
             "ma_phong_kham": self.clinic_id,
             "ten_phong_kham": self.clinic_name,
             "chuyen_khoa_pk": self.clinic_specialty,
-            "danh_sach_ma_bac_si": LIST_ID_SEPARATOR.join(doctor_str_list_py) # Cần sửa lại logic này
+            "danh_sach_ma_bac_si": LIST_ID_SEPARATOR.join(doctor_str_list_py)
         }
 
     @classmethod
@@ -227,32 +223,30 @@ class Patient:
 
 class PatientInQueue:
     PRIORITY_MAP = {'Tái khám': 1, 'Thông thường': 2, 'Ưu tiên': 3, 'Ưu tiên cao': 4, 'Cấp cứu': 5}
-    # Đảm bảo PRIORITY_DISPLAY_MAP ánh xạ đúng các mức ưu tiên sang tên hiển thị mong muốn
-    # Ví dụ: nếu bạn muốn mức 3 hiển thị là "Ưu tiên":
     PRIORITY_DISPLAY_MAP = {v: k for k, v in PRIORITY_MAP.items()}
 
 
     def __init__(self, patient_profile_obj, priority_str_val, registration_timestamp=None):
         self.patient_profile = patient_profile_obj
-        self.patient_id = patient_profile_obj.patient_id # Sửa lại để lấy patient_id
-        if not self.create_and_set_priority(priority_str_val): # Gọi hàm _set_priority
+        self.patient_id = patient_profile_obj.patient_id
+        if not self.create_and_set_priority(priority_str_val):
             raise ValueError(f"Mức ưu tiên không hợp lệ: {priority_str_val}")
         self.registration_time = registration_timestamp if registration_timestamp else datetime.datetime.now()
-        self.absent_count = 0 # Khởi tạo số lần vắng mặt
+        self.absent_count = 0 
 
-    def create_and_set_priority(self, priority_str_val): # Đổi tên từ _set_priority
+    def create_and_set_priority(self, priority_str_val): 
         if priority_str_val in self.PRIORITY_MAP:
             self.priority = self.PRIORITY_MAP[priority_str_val]
             return True
         return False
 
-    def increment_absent_count(self): # Hàm tăng số lần vắng
+    def increment_absent_count(self):
         self.absent_count += 1
 
-    def should_leave_queue(self): # Hàm kiểm tra có nên rời hàng đợi không
+    def should_leave_queue(self):
         return self.absent_count >= 3
 
-    def get_priority_display_name(self): # Lấy tên hiển thị của mức ưu tiên
+    def get_priority_display_name(self):
         return self.PRIORITY_DISPLAY_MAP.get(self.priority, "Không xác định")
 
     def __str__(self):
@@ -265,7 +259,7 @@ class PatientInQueue:
     def __gt__(self, other_patient_in_queue):
         if self.priority != other_patient_in_queue.priority:
             return self.priority > other_patient_in_queue.priority
-        return self.registration_time < other_patient_in_queue.registration_time # Thời gian đăng ký sớm hơn -> ưu tiên cao hơn
+        return self.registration_time < other_patient_in_queue.registration_time
 
     def __lt__(self, other_patient_in_queue):
         if self.priority != other_patient_in_queue.priority:
