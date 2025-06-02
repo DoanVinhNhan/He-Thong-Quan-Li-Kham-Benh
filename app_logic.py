@@ -378,7 +378,7 @@ class MedicalSystemLogic:
         if new_priority_level_str not in PatientInQueue.PRIORITY_MAP: return False, f"Ưu tiên '{new_priority_level_str}' không hợp lệ.", "ERROR"
         clinic_queue = self.clinic_examination_queues.get_item(clinic_id_val)
         if not clinic_queue: return False, f"Không tìm thấy HĐ PK {clinic_id_val}.", "ERROR"
-        success_flag = clinic_queue.change_queued_patient_priority(patient_id_val, new_priority_level_str, PatientInQueue_class_ref=PatientInQueue)
+        success_flag = clinic_queue.change_queued_patient_priority(patient_id_val, new_priority_level_str, patient_in_queue_class_ref=PatientInQueue)
         if success_flag: return True, f"Đã đổi ưu tiên BN {patient_id_val} tại PK {clinic_id_val} thành '{new_priority_level_str}'.", "INFO"
         return False, f"Không thể đổi ưu tiên BN {patient_id_val} tại PK {clinic_id_val}.", "ERROR"
 
