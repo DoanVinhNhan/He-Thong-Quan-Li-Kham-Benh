@@ -20,6 +20,7 @@ DOCTORS_CSV_FILENAME = "doctors_data.csv"
 CLINICS_CSV_FILENAME = "clinics_data.csv"
 
 class MedicalSystemLogic:
+    """Logic nghiệp vụ chính của hệ thống quản lý khám bệnh."""
     def __init__(self, hash_table_default_size=100):
         self.patient_records_table = HashTable(initial_table_size=hash_table_default_size)
         self.next_patient_id_counter = 1
@@ -168,8 +169,10 @@ class MedicalSystemLogic:
 
 
     def _generate_patient_id(self): patient_id_val = f"BN{self.next_patient_id_counter:04d}"; self.next_patient_id_counter += 1; return patient_id_val
+        """Tạo ID bệnh nhân mới."""
 
     def create_patient_record(self, full_name_val, dob_str, gender_val, address_val, phone_val, national_id_val, health_insurance_id_val="", medical_history_val="", drug_allergies_val=""):
+        """Tạo hồ sơ bệnh nhân mới."""
         if not all([full_name_val.strip(), dob_str.strip(), gender_val.strip(), phone_val.strip(), national_id_val.strip()]): return None, "Các trường (*) là bắt buộc.", "ERROR"
         try: dob_obj = datetime.datetime.strptime(dob_str, DATE_FORMAT_CSV).date()
         except ValueError: return None, f"Ngày sinh '{dob_str}' không hợp lệ (YYYY-MM-DD).", "ERROR"
@@ -197,8 +200,10 @@ class MedicalSystemLogic:
         return patient_obj, f"Đã tạo hồ sơ BN: {new_patient_id}", "INFO"
 
     def find_patient_by_id(self, patient_id_val): return self.patient_records_table.get_item(patient_id_val)
+        """Tìm bệnh nhân theo ID."""
 
     def update_patient_info(self, patient_id_val, **update_kwargs):
+        """Cập nhật thông tin bệnh nhân."""
         patient_obj = self.find_patient_by_id(patient_id_val)
         if not patient_obj: return False, f"BN mã {patient_id_val} không tồn tại.", "ERROR"
 
@@ -254,6 +259,7 @@ class MedicalSystemLogic:
 
 
     def delete_patient_record(self, patient_id_val):
+        """Xóa hồ sơ bệnh nhân."""
         patient_to_delete = self.find_patient_by_id(patient_id_val)
         if not patient_to_delete:
             return False, f"Không tìm thấy BN {patient_id_val}.", "ERROR"
@@ -278,6 +284,7 @@ class MedicalSystemLogic:
         return False, f"Lỗi khi xóa BN {patient_id_val} khỏi bảng băm chính.", "ERROR"
 
     def register_for_examination(self, patient_id_val, clinic_id_val, priority_level_str):
+        """Đăng ký bệnh nhân vào hàng đợi khám."""
         patient_obj = self.find_patient_by_id(patient_id_val)
         if not patient_obj: return False, f"Không tìm thấy BN mã {patient_id_val}.", "ERROR"
         clinic_obj = self.find_clinic_by_id(clinic_id_val)
@@ -300,6 +307,7 @@ class MedicalSystemLogic:
         return True, f"BN {patient_obj.full_name} đã thêm vào HĐ PK {clinic_id_val} ưu tiên '{priority_level_str}'.", "INFO"
 
     def call_next_patient_for_exam(self, clinic_id_val):
+        """Gọi bệnh nhân tiếp theo từ hàng đợi."""
         clinic_queue = self.clinic_examination_queues.get_item(clinic_id_val)
         if not clinic_queue or clinic_queue.is_empty(): return None, f"HĐ PK {clinic_id_val} rỗng.", "INFO"
         exam_patient = clinic_queue.remove_first_item()
@@ -307,6 +315,7 @@ class MedicalSystemLogic:
         return None, f"Không có BN trong HĐ PK {clinic_id_val}.", "INFO"
 
     def complete_examination(self, patient_id_val, exam_type, exam_result, exam_notes="", attending_doctor_id="", exam_clinic_id=""):
+        """Hoàn thành khám, lưu lịch sử."""
         patient_obj = self.find_patient_by_id(patient_id_val)
         if patient_obj:
             patient_obj.add_examination_record(datetime.date.today(), exam_type, exam_result, exam_notes, attending_doctor_id, exam_clinic_id)
@@ -322,6 +331,7 @@ class MedicalSystemLogic:
         return False, f"Không tìm thấy BN {patient_id_val}.", "ERROR"
 
     def handle_absent_called_patient(self, absent_patient_obj, original_clinic_id):
+        """Xử lý bệnh nhân được gọi vắng mặt."""
         if not absent_patient_obj: return True, "Lỗi: Không có BN vắng mặt.", "ERROR"
         clinic_queue = self.clinic_examination_queues.get_item(original_clinic_id)
         if not clinic_queue: return True, f"Lỗi: Không tìm thấy HĐ PK {original_clinic_id}.", "ERROR"
@@ -335,6 +345,7 @@ class MedicalSystemLogic:
             return False, msg + f" BN đưa lại HĐ PK {original_clinic_id} ưu tiên '{absent_patient_obj.get_priority_display_name()}'.", "INFO"
 
     def handle_patient_leaving_queue(self, patient_id_leaving, clinic_id_val):
+        """Xử lý bệnh nhân rời hàng đợi."""
         clinic_queue = self.clinic_examination_queues.get_item(clinic_id_val)
         if not clinic_queue: return False, f"Không tìm thấy HĐ PK {clinic_id_val}.", "ERROR"
         all_q_patients_custom_array = clinic_queue.internal_heap.get_all_heap_elements()
@@ -351,12 +362,14 @@ class MedicalSystemLogic:
         return False, f"Không tìm thấy BN {patient_id_leaving} trong HĐ PK {clinic_id_val}.", "ERROR"
 
     def get_clinic_queue_display_list(self, clinic_id_val):
+        """Lấy danh sách chuỗi hiển thị hàng đợi của PK."""
         clinic_queue = self.clinic_examination_queues.get_item(clinic_id_val)
         empty_msg_list = List(); empty_msg_list.append(f"Hàng đợi PK {clinic_id_val} rỗng.")
         if not clinic_queue or clinic_queue.is_empty(): return empty_msg_list
         return clinic_queue.get_display_queue_as_strings(patient_in_queue_class_ref=PatientInQueue)
 
     def update_priority_for_long_waiters(self, clinic_id_val, max_wait_seconds=3600):
+        """Tăng ưu tiên cho BN chờ lâu."""
         clinic_queue = self.clinic_examination_queues.get_item(clinic_id_val)
         if not clinic_queue: return 0, f"Không tìm thấy HĐ PK {clinic_id_val}.", "ERROR"
         num_upd = clinic_queue.update_long_waiter_priority(max_wait_seconds, PatientInQueue_class_ref=PatientInQueue)
@@ -364,6 +377,7 @@ class MedicalSystemLogic:
         return 0, f"Không có BN tại PK {clinic_id_val} cần cập nhật ưu tiên.", "INFO"
 
     def change_patient_priority_in_queue(self, clinic_id_val, patient_id_val, new_priority_level_str):
+        """Thay đổi ưu tiên của BN trong hàng đợi."""
         if new_priority_level_str not in PatientInQueue.PRIORITY_MAP: return False, f"Ưu tiên '{new_priority_level_str}' không hợp lệ.", "ERROR"
         clinic_queue = self.clinic_examination_queues.get_item(clinic_id_val)
         if not clinic_queue: return False, f"Không tìm thấy HĐ PK {clinic_id_val}.", "ERROR"
@@ -375,6 +389,7 @@ class MedicalSystemLogic:
     def list_patients_examined_today(self): return self.examined_patients_today_list
 
     def advanced_patient_search(self, **search_criteria):
+        """Tìm kiếm bệnh nhân nâng cao."""
         phone_query_exact = search_criteria.get("phone_number_exact", "").strip()
         national_id_query_exact = search_criteria.get("national_id_exact", "").strip()
 
