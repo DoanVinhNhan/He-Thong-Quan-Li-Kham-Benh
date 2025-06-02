@@ -9,6 +9,7 @@ HISTORY_FIELD_SEPARATOR = ";"
 LIST_ID_SEPARATOR = ","
 
 class Doctor:
+    """Lớp đại diện Bác sĩ."""
     def __init__(self, doctor_id, doctor_name, specialty, clinic_id_list_str=""):
         self.doctor_id = doctor_id
         self.doctor_name = doctor_name
@@ -42,6 +43,7 @@ class Doctor:
         return f"BS: {self.doctor_id} - {self.doctor_name} ({self.specialty})"
 
 class Clinic:
+    """Lớp đại diện Phòng khám."""
     def __init__(self, clinic_id, clinic_name, clinic_specialty_val, doctor_id_list_str=""):
         self.clinic_id = clinic_id
         self.clinic_name = clinic_name
@@ -75,6 +77,7 @@ class Clinic:
         return f"PK: {self.clinic_id} - {self.clinic_name} ({self.clinic_specialty})"
 
 class Patient:
+    """Lớp đại diện Bệnh nhân."""
     def __init__(self, patient_id, full_name, date_of_birth_val, gender, address, phone_number, national_id,
                  health_insurance_id="", medical_history_summary_val="", drug_allergies_val="",
                  system_registration_time_str=None, examination_history_str=None):
@@ -222,6 +225,7 @@ class Patient:
         )
 
 class PatientInQueue:
+    """Lớp đại diện Bệnh nhân trong hàng đợi khám."""
     PRIORITY_MAP = {'Tái khám': 1, 'Thông thường': 2, 'Ưu tiên': 3, 'Ưu tiên cao': 4, 'Cấp cứu': 5}
     PRIORITY_DISPLAY_MAP = {v: k for k, v in PRIORITY_MAP.items()}
 
