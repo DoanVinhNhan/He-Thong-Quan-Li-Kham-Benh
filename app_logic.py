@@ -11,12 +11,8 @@ from custom_structures import CustomPriorityQueue, LinkedList, HashTable, List, 
 def resource_path(relative_path):
     """ Lấy đường dẫn tuyệt đối đến tài nguyên, hoạt động cho cả chế độ dev và PyInstaller """
     try:
-        # PyInstaller tạo một thư mục tạm thời và lưu trữ đường dẫn trong _MEIPASS
-        # Đây là thư mục chứa các tệp dữ liệu khi ứng dụng được đóng gói.
         base_path = sys._MEIPASS
-    except Exception:
-        # Nếu không chạy từ PyInstaller (chế độ dev), sử dụng đường dẫn hiện tại của script.
-        base_path = os.path.abspath(".")
+    except Exception:        base_path = os.path.abspath(".")
     return os.path.join(base_path, relative_path)
 
 PATIENTS_CSV_FILENAME = "patients_data.csv"
@@ -28,11 +24,9 @@ class MedicalSystemLogic:
         self.patient_records_table = HashTable(initial_table_size=hash_table_default_size)
         self.next_patient_id_counter = 1
 
-        # Khởi tạo Radix Trees
         self.phone_radix_tree = RadixTree()
         self.national_id_radix_tree = RadixTree()
 
-        # Sử dụng resource_path khi tải dữ liệu
         patients_data_path = resource_path(PATIENTS_CSV_FILENAME)
         doctors_data_path = resource_path(DOCTORS_CSV_FILENAME)
         clinics_data_path = resource_path(CLINICS_CSV_FILENAME)
@@ -134,11 +128,6 @@ class MedicalSystemLogic:
     def _get_save_path(self, csv_filename_const):
         """
         Xác định đường dẫn để lưu tệp CSV.
-        - Chế độ dev: Lưu vào thư mục hiện tại của script.
-        - Chế độ đóng gói (--onedir): Lưu vào thư mục chứa tệp .exe.
-        - Chế độ đóng gói (--onefile): Lưu vào thư mục chứa tệp .exe.
-          LƯU Ý: Việc ghi đè tệp dữ liệu trong bundle _MEIPASS là không thể.
-                  Hàm này sẽ lưu ra bên ngoài bundle.
         """
         if getattr(sys, 'frozen', False):
             # Chạy từ ứng dụng đã đóng gói (PyInstaller)
@@ -424,13 +413,13 @@ class MedicalSystemLogic:
         return results_list
 
     def search_patient_by_phone_radix(self, phone_number):
-        """Tìm kiếm patient_id bằng số điện thoại sử dụng RadixTree (khớp chính xác)."""
+        """Tìm kiếm patient_id bằng số điện thoại sử dụng RadixTree."""
         if not phone_number or not isinstance(phone_number, str):
             return None
         return self.phone_radix_tree.search(phone_number.strip())
 
     def search_patient_by_national_id_radix(self, national_id):
-        """Tìm kiếm patient_id bằng CCCD sử dụng RadixTree (khớp chính xác)."""
+        """Tìm kiếm patient_id bằng CCCD sử dụng RadixTree."""
         if not national_id or not isinstance(national_id, str):
             return None
         return self.national_id_radix_tree.search(national_id.strip())
@@ -565,7 +554,6 @@ class MedicalSystemLogic:
         all_history_custom_array = self._collect_all_examination_history()
         if all_history_custom_array.is_empty(): return List(), "Không có lịch sử khám.", "INFO"
 
-        # Chuyển đổi Custom List sang Python List để dễ dàng lọc bằng list comprehensions
         filtered_py_list = self._convert_custom_list_to_py_list(all_history_custom_array)
 
         from_date_obj = None; to_date_obj = None
