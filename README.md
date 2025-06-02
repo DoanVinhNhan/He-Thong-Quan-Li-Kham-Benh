@@ -22,7 +22,7 @@ Dữ liệu của hệ thống được lưu trữ trong các tệp CSV: `patien
 
 Đây là cách đơn giản nhất để trải nghiệm ứng dụng mà không cần cài đặt Python hay bất kỳ thư viện phức tạp nào.
 
-1.  **Tải ứng dụng**:
+1.  **Tải file .zip ở Release**:
     * Truy cập trang GitHub của dự án.
     * Tìm đến mục **"Releases"** (thường nằm ở thanh bên phải hoặc trong menu chính của kho chứa).
     * Chọn phiên bản mới nhất (ví dụ: **Phiên bản 1.3 - Ứng dụng Quản lý Khám Bệnh "latest"**).
