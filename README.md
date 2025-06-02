@@ -4,7 +4,22 @@ Bài tập Lớn môn Cấu trúc Dữ liệu và Giải thuật - Đại học 
 
 158236 - MI3060
 
-## 1. Mô tả tổng quan
+## 1. Thông tin nhóm sinh viên
+
+* Đặng Thị Thuỳ Dương - 20237318
+* Nguyễn Thị Huệ - 20237439
+* Đoàn Vĩnh Nhân - 20237376
+
+## 2. Cấu trúc mã nguồn
+
+* `main_gui.py`: Chứa mã nguồn cho giao diện người dùng đồ họa (GUI) của ứng dụng, sử dụng thư viện CustomTkinter. Đây là điểm khởi đầu chính của chương trình.
+* `app_logic.py`: Bao gồm logic nghiệp vụ cốt lõi của hệ thống, điều phối các hoạt động giữa giao diện người dùng và các module xử lý dữ liệu.
+* `models.py`: Định nghĩa các lớp đối tượng dữ liệu được sử dụng trong toàn bộ hệ thống, ví dụ: `Patient` (Bệnh nhân), `Doctor` (Bác sĩ), `Clinic` (Phòng khám), `PatientInQueue` (Bệnh nhân trong hàng đợi).
+* `custom_structures.py`: Chứa các cài đặt tùy chỉnh cho những cấu trúc dữ liệu và giải thuật được sử dụng trong dự án, như `LinkedList` (Danh sách liên kết), `HashTable` (Bảng băm), `MaxHeap` (Đống cực đại), `PriorityQueue` (Hàng đợi ưu tiên), `RadixTree` (Cây cơ số).
+* `requirements.txt`: Liệt kê tất cả các thư viện Python bên ngoài cần thiết để chạy dự án.
+* Các tệp `.csv` (ví dụ: `patients_data.csv`, `doctors_data.csv`, `clinics_data.csv`): Được sử dụng để lưu trữ và tải dữ liệu cố định của hệ thống.
+
+## 3. Mô tả tổng quan
 
 Chương trình mô phỏng hệ thống quản lý hoạt động khám bệnh tại một cơ sở y tế đa khoa, bao gồm các chức năng chính:
 
@@ -18,7 +33,7 @@ Chương trình mô phỏng hệ thống quản lý hoạt động khám bệnh 
 Dữ liệu của hệ thống được lưu trữ trong các tệp CSV: `patients_data.csv`, `doctors_data.csv`, `clinics_data.csv`.
 Định dạng ngày tháng được sử dụng trong toàn bộ hệ thống và các tệp CSV là `YYYY/MM/DD`.
 
-## 2. Hướng dẫn sử dụng nhanh (Cho người dùng cuối - Phiên bản đóng gói sẵn)
+## 4. Hướng dẫn sử dụng nhanh (Cho người dùng cuối - Phiên bản đóng gói sẵn)
 
 Đây là cách đơn giản nhất để trải nghiệm ứng dụng mà không cần cài đặt Python hay bất kỳ thư viện phức tạp nào.
 
@@ -46,7 +61,7 @@ Dữ liệu của hệ thống được lưu trữ trong các tệp CSV: `patien
     * **Trên Linux**:
         * Tìm và nháy đúp chuột vào tệp ứng dụng `QuanLyKhamBenh`.
 
-## 3. Hướng dẫn cài đặt và chạy chương trình (Cho nhà phát triển)
+## 5. Hướng dẫn cài đặt và chạy chương trình (Cho nhà phát triển)
 
 Phần này dành cho những ai muốn chạy ứng dụng từ mã nguồn hoặc đóng góp phát triển.
 
@@ -56,7 +71,7 @@ Phần này dành cho những ai muốn chạy ứng dụng từ mã nguồn ho�
 
 **LƯU Ý QUAN TRỌNG**: Để đảm bảo ứng dụng giao diện đồ họa (GUI) sử dụng CustomTkinter hoạt động ổn định, việc thiết lập một môi trường Python với phiên bản Tcl/Tk tương thích là rất cần thiết, đặc biệt trên hệ điều hành macOS.
 
-### 3.1. Bước chung cho mọi hệ điều hành:
+### 5.1. Bước chung cho mọi hệ điều hành:
 
 1.  **Tải mã nguồn**:
     * Clone kho chứa GitHub này về máy của bạn:
@@ -66,7 +81,7 @@ Phần này dành cho những ai muốn chạy ứng dụng từ mã nguồn ho�
     * Hoặc tải về dưới dạng ZIP và giải nén.
 2.  **Cấu trúc thư mục**: Đảm bảo các tệp mã nguồn Python (`.py`) và các tệp dữ liệu (`.csv` như `patients_data.csv`, `doctors_data.csv`, `clinics_data.csv`) nằm trong cùng một thư mục gốc của dự án.
 
-### 3.2. Hướng dẫn cho người dùng Windows:
+### 5.2. Hướng dẫn cho người dùng Windows:
 
 1.  **Cài đặt Python**:
     * Tải bản cài đặt Python (phiên bản 3.9 trở lên) từ trang chủ [python.org](https://www.python.org/).
@@ -93,7 +108,7 @@ Phần này dành cho những ai muốn chạy ứng dụng từ mã nguồn ho�
     deactivate
     ```
 
-### 3.3. Hướng dẫn cho người dùng Linux:
+### 5.3. Hướng dẫn cho người dùng Linux:
 
 1.  **Cài đặt Python và Tkinter**:
     * Hầu hết các bản phân phối Linux hiện đại đã có sẵn Python 3. Kiểm tra bằng lệnh `python3 --version`.
@@ -129,7 +144,7 @@ Phần này dành cho những ai muốn chạy ứng dụng từ mã nguồn ho�
     deactivate
     ```
 
-### 3.4. Hướng dẫn cho người dùng macOS:
+### 5.4. Hướng dẫn cho người dùng macOS:
 
 Do phiên bản Tcl/Tk đi kèm với Python hệ thống trên macOS thường đã cũ (ví dụ: 8.5.x) và có thể không tương thích tốt hoặc gây ra các vấn đề hiển thị với CustomTkinter, chúng tôi **khuyến nghị mạnh mẽ** sử dụng trình quản lý gói Homebrew để cài đặt một phiên bản Python và Tcl/Tk mới hơn.
 
@@ -187,19 +202,3 @@ Do phiên bản Tcl/Tk đi kèm với Python hệ thống trên macOS thường 
     ```bash
     deactivate
     ```
-
-## 4. Cấu trúc mã nguồn
-
-* `main_gui.py`: Chứa mã nguồn cho giao diện người dùng đồ họa (GUI) của ứng dụng, sử dụng thư viện CustomTkinter. Đây là điểm khởi đầu chính của chương trình.
-* `app_logic.py`: Bao gồm logic nghiệp vụ cốt lõi của hệ thống, điều phối các hoạt động giữa giao diện người dùng và các module xử lý dữ liệu.
-* `models.py`: Định nghĩa các lớp đối tượng dữ liệu được sử dụng trong toàn bộ hệ thống, ví dụ: `Patient` (Bệnh nhân), `Doctor` (Bác sĩ), `Clinic` (Phòng khám), `PatientInQueue` (Bệnh nhân trong hàng đợi).
-* `custom_structures.py`: Chứa các cài đặt tùy chỉnh cho những cấu trúc dữ liệu và giải thuật được sử dụng trong dự án, như `LinkedList` (Danh sách liên kết), `HashTable` (Bảng băm), `MaxHeap` (Đống cực đại), `PriorityQueue` (Hàng đợi ưu tiên), `RadixTree` (Cây cơ số).
-* `requirements.txt`: Liệt kê tất cả các thư viện Python bên ngoài cần thiết để chạy dự án.
-* Các tệp `.csv` (ví dụ: `patients_data.csv`, `doctors_data.csv`, `clinics_data.csv`): Được sử dụng để lưu trữ và tải dữ liệu cố định của hệ thống.
-
-## 5. Thông tin nhóm sinh viên
-
-* Đặng Thị Thuỳ Dương - 20237318
-* Nguyễn Thị Huệ - 20237439
-* Đoàn Vĩnh Nhân - 20237376
-
