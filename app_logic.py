@@ -2,14 +2,12 @@
 import datetime
 import csv
 import os
-import sys # Để dùng sys._MEIPASS cho PyInstaller
+import sys
 
 from models import Patient, PatientInQueue, DATE_FORMAT_CSV, Doctor, Clinic
 from custom_structures import CustomPriorityQueue, LinkedList, HashTable, List, RadixTree
 
-# Hàm lấy đường dẫn tài nguyên, tương thích PyInstaller
 def resource_path(relative_path):
-    """ Lấy đường dẫn tuyệt đối, hoạt động cho dev và PyInstaller. """
     try: base_path = sys._MEIPASS # Chạy từ PyInstaller
     except Exception: base_path = os.path.abspath(".") # Chạy ở chế độ dev
     return os.path.join(base_path, relative_path)
