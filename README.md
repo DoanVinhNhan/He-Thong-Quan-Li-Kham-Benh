@@ -39,7 +39,7 @@ Dữ liệu của hệ thống được lưu trữ trong các tệp CSV: `patien
 
 1.  **Tải file .zip ở Release**:
     * Tìm đến mục **"Releases"** (thường nằm ở thanh bên phải hoặc trong menu chính của kho chứa).
-    * Chọn phiên bản mới nhất (ví dụ: **Phiên bản 1.3 - Ứng dụng Quản lý Khám Bệnh "latest"**).
+    * Chọn phiên bản mới nhất (ví dụ: **Phiên bản 1.4 - Ứng dụng Quản lý Khám Bệnh "latest"**).
     * Trong mục "Assets" của release đó, tải về tệp **ZIP** phù hợp với hệ điều hành của bạn (ví dụ: `QuanLyKhamBenh-Windows.zip`, `QuanLyKhamBenh-macOS-Intel.zip`, `QuanLyKhamBenh-macOS-Silicon.zip`, `QuanLyKhamBenh-Linux.zip`).
     * Lưu tệp ZIP này vào máy tính.
 
