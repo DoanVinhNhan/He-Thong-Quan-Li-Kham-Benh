@@ -8,8 +8,8 @@ from models import Patient, PatientInQueue, DATE_FORMAT_CSV, Doctor, Clinic
 from custom_structures import CustomPriorityQueue, LinkedList, HashTable, List, RadixTree
 
 def resource_path(relative_path):
-    try: base_path = sys._MEIPASS # Chạy từ PyInstaller
-    except Exception: base_path = os.path.abspath(".") # Chạy ở chế độ dev
+    try: base_path = sys._MEIPASS 
+    except Exception: base_path = os.path.abspath(".")
     return os.path.join(base_path, relative_path)
 
 # Tên file CSV dữ liệu
