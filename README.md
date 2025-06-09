@@ -75,7 +75,7 @@ Phần này dành cho những ai muốn chạy ứng dụng từ mã nguồn ho�
 1.  **Tải mã nguồn**:
     * Clone kho chứa GitHub này về máy của bạn:
         ```bash
-        git clone [URL_KHO_CHUA_CUA_BAN]
+        git clone https://github.com/DoanVinhNhan/He-Thong-Quan-Li-Kham-Benh
         ```
     * Hoặc tải về dưới dạng ZIP và giải nén.
 2.  **Cấu trúc thư mục**: Đảm bảo các tệp mã nguồn Python (`.py`) và các tệp dữ liệu (`.csv` như `patients_data.csv`, `doctors_data.csv`, `clinics_data.csv`) nằm trong cùng một thư mục gốc của dự án.
